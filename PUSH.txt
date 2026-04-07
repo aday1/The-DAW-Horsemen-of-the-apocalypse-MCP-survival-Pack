@@ -1,0 +1,20 @@
+Push this pack to GitHub (one time)
+====================================
+
+1. On https://github.com/new create an EMPTY repository named exactly:
+
+   The_DAW_Horsemen_of_the_apocalypse_MCP_Pack
+
+   Do not add README or .gitignore (this repo already has them).
+
+2. In this folder run (replace YOUR_USER):
+
+   git remote set-url origin https://github.com/YOUR_USER/The_DAW_Horsemen_of_the_apocalypse_MCP_Pack.git
+   git push -u origin main
+
+If you have not added origin yet:
+
+   git remote add origin https://github.com/YOUR_USER/The_DAW_Horsemen_of_the_apocalypse_MCP_Pack.git
+   git push -u origin main
+
+If "repository not found": wrong username, or the empty repo was not created on GitHub yet.
