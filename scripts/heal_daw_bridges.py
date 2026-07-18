@@ -518,15 +518,34 @@ def main() -> int:
     write_mcp_generated(pack)
 
     print("[6] agent MCP path heal (Cursor / Claude Code / pack)")
-    jam = pack.parent
-    patch_json_mcp(jam / ".mcp.json", pack, create=True)
-    patch_json_mcp(jam / ".cursor" / "mcp.json", pack, create=True)
+    # Dev clone: pack lives inside a jam/repo tree (parent has .git or jam/).
+    # MSI install: pack is %LOCALAPPDATA%\Programs\DAW-Horsemen — parent is NOT a project.
+    jam_roots: list[Path] = []
+    parent = pack.parent
+    if parent.name.lower() != "programs" and (
+        (parent / ".git").exists()
+        or (parent / "jam").is_dir()
+        or (parent / "AdLibitum.bat").is_file()
+        or (parent / ".mcp.json").is_file()
+    ):
+        jam_roots.append(parent)
+    for cand in (Path(r"E:\ChiptuneClaude"), Path.home() / "ChiptuneClaude"):
+        if cand.is_dir() and cand.resolve() != pack.resolve():
+            if (cand / "jam").is_dir() or (cand / "AdLibitum.bat").is_file():
+                if cand not in jam_roots:
+                    jam_roots.append(cand)
+
+    for jam in jam_roots:
+        patch_json_mcp(jam / ".mcp.json", pack, create=True)
+        patch_json_mcp(jam / ".cursor" / "mcp.json", pack, create=True)
+        patch_json_mcp(jam / ".vscode" / "mcp.json", pack, create=False)
+    if not jam_roots:
+        print("  ..  no jam project beside pack (MSI/ZIP install OK) — pack + Desktop only")
     patch_json_mcp(pack / ".mcp.json", pack, create=True)
     patch_json_mcp(pack / ".cursor" / "mcp.json", pack, create=True)
-    patch_json_mcp(jam / ".vscode" / "mcp.json", pack, create=False)
 
     print("[7] Claude Code / Claude CLI enable list")
-    ensure_claude_code_enabled([jam, pack])
+    ensure_claude_code_enabled(jam_roots + [pack])
 
     print("[8] Claude Desktop")
     patch_claude_desktop(pack)

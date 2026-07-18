@@ -13,19 +13,23 @@ Write-Host ''
 Write-Host '== DAW HORSEMEN HEALTH =='
 Write-Host "Pack: $Pack"
 
-# --- git source of truth ---
+# --- git source of truth (clone) / skip for MSI-ZIP installs ---
 Write-Host ''
 Write-Host '[git]'
 Push-Location $Pack
 try {
-  $remote = (git remote get-url origin 2>$null)
-  if ($remote -match 'The-DAW-Horsemen') { Ok "origin $remote" } else { Bad "unexpected origin: $remote" }
-  git fetch origin --quiet 2>$null
-  $counts = (git rev-list --left-right --count origin/main...HEAD 2>$null)
-  if ($counts -eq '0	0' -or $counts -eq '0 0') { Ok 'in sync with origin/main' }
-  else { Bad "ahead/behind origin/main: $counts (run UPDATE.bat or commit/push)" }
-  $head = (git rev-parse --short HEAD)
-  Info "HEAD $head"
+  if (-not (Test-Path -LiteralPath (Join-Path $Pack '.git'))) {
+    Info 'MSI/ZIP install (no .git) - reinstall from GitHub Releases to update'
+  } else {
+    $remote = (git remote get-url origin 2>$null)
+    if ($remote -match 'The-DAW-Horsemen') { Ok "origin $remote" } else { Bad "unexpected origin: $remote" }
+    git fetch origin --quiet 2>$null
+    $counts = (git rev-list --left-right --count origin/main...HEAD 2>$null)
+    if ($counts -eq '0	0' -or $counts -eq '0 0') { Ok 'in sync with origin/main' }
+    else { Bad "ahead/behind origin/main: $counts (run UPDATE.bat or commit/push)" }
+    $head = (git rev-parse --short HEAD)
+    Info "HEAD $head"
+  }
 } finally { Pop-Location }
 
 # --- packages present ---
