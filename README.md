@@ -32,6 +32,18 @@ UPDATE.bat
 
 Checks GitHub, pulls if behind, refreshes deps. That's the whole updater.
 
+## Launchers (DAWs + MCPs)
+
+Desktop / day-to-day:
+
+```bat
+launch_daw_mcp.bat
+```
+
+Menu can start Bitwig / REAPER / Renoise **and** their MCP side, run a health
+check (`scripts\health_check.ps1`), INSTALL, or UPDATE. Root jam-machine
+`E:\ChiptuneClaude\launch_daw_mcp.bat` is a thin wrapper that calls this one.
+
 ## Bitwig: ONE shared server, many clients
 
 Bitwig's OSC controller talks to **one** process. Don't let every MCP client
@@ -44,6 +56,9 @@ packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat
 Then every client (Claude CLI, Cursor, Claude Desktop/Cowork) uses:
 `http://127.0.0.1:8080/sse` — full story in `packages/bitwig-mcp-server/SHARED_SERVER.md`.
 
+**Yes — shared Bitwig MCP works across all agents on the machine** as long as
+each client points at that SSE URL (not `python -m bitwig_mcp_server` stdio).
+REAPER / Renoise stay stdio-per-client (no single OSC port to fight over).
 ## Dev flow
 
 Dev happens in the clone (on the dev box: `E:\ChiptuneClaude\DAW-Horsemen`).
