@@ -1,8 +1,10 @@
-# Build a clean release ZIP from the current git HEAD (no local junk).
-# Output: dist\DAW-Horsemen-<VERSION>.zip
+# Build release artifacts from git HEAD.
+# Primary: dist\DAW-Horsemen-<VERSION>.msi
+# Also:    dist\DAW-Horsemen-<VERSION>.zip  (optional mirror / non-Windows)
 param(
   [string]$PackRoot = (Split-Path $PSScriptRoot -Parent),
-  [string]$Tag = ''
+  [string]$Tag = '',
+  [switch]$ZipAlso
 )
 
 $ErrorActionPreference = 'Stop'
@@ -14,16 +16,19 @@ if (-not $Tag) { $Tag = "v$ver" }
 $dist = Join-Path $PackRoot 'dist'
 New-Item -ItemType Directory -Path $dist -Force | Out-Null
 
-$zipName = "DAW-Horsemen-$ver.zip"
-$zipPath = Join-Path $dist $zipName
-if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+# MSI is the ship artifact
+& (Join-Path $PSScriptRoot 'build_msi.ps1') -PackRoot $PackRoot -Tag $Tag
+if ($LASTEXITCODE -ne 0) { throw "build_msi failed: $LASTEXITCODE" }
 
-# git archive = committed tree only (respects .gitattributes export-ignore if any)
-$prefix = "DAW-Horsemen-$ver/"
-git archive --format=zip --prefix=$prefix -o $zipPath HEAD
-if ($LASTEXITCODE -ne 0) { throw "git archive failed: $LASTEXITCODE" }
+if ($ZipAlso) {
+  $zipName = "DAW-Horsemen-$ver.zip"
+  $zipPath = Join-Path $dist $zipName
+  if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+  $prefix = "DAW-Horsemen-$ver/"
+  git archive --format=zip --prefix=$prefix -o $zipPath HEAD
+  if ($LASTEXITCODE -ne 0) { throw "git archive zip failed: $LASTEXITCODE" }
+  Write-Host "ZIP $zipPath"
+}
 
-$bytes = (Get-Item $zipPath).Length
-Write-Host "OK  $zipPath  ($([math]::Round($bytes/1MB, 1)) MB)"
 Write-Host "TAG $Tag"
-Write-Host "ZIP $zipPath"
+Write-Host "Primary artifact: MSI in $dist"

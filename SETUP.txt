@@ -39,5 +39,5 @@ Showcase
 
 Maintainers
 -----------
-  RELEASE.bat   ZIP + GitHub release
+  RELEASE.bat   MSI + GitHub release
   PUBLISH.bat   git push

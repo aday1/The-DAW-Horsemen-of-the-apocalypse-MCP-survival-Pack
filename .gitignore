@@ -41,3 +41,7 @@ packages/renoise-mcp-bridge/package-lock.json
 # Machine-local agent MCP (heal writes absolute paths)
 .mcp.json
 .cursor/mcp.json
+
+# WiX local cache / build crumbs
+.wix/
+

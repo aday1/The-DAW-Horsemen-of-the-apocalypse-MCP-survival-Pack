@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.1 — "MSI Ship" (2026-07-18)
+- **Release artifact is MSI** (`DAW-Horsemen-<ver>.msi`), not ZIP.
+  WiX 7 packager: `installer/Product.wxs` + `scripts/build_msi.ps1`.
+  Per-user install → `%LOCALAPPDATA%\Programs\DAW-Horsemen`, Start Menu +
+  Desktop shortcuts, HKCU `Software\aday\DAW-Horsemen\InstallLocation`.
+- `RELEASE.bat` uploads the MSI to GitHub Releases.
+- After install: run **CARE** (Start Menu) or open **DAW Horsemen** GUI.
+
 ## 2.5.0 — "GUI Launcher" (2026-07-18)
 - **`launcher_gui.py`**: Tkinter GUI — CARE / heal / update / start stacks,
   live **health pills** (Bitwig, REAPER, Renoise, SSE, ReMCP, git), scrolling
