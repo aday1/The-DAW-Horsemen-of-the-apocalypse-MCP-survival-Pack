@@ -2,7 +2,7 @@
 
 Four DAWs. One repo. Your AI rides them all.
 
-**Out of the box (any machine):**
+## Out of the box
 
 ```bat
 git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
@@ -10,65 +10,39 @@ cd DAW-Horsemen
 CARE.bat
 ```
 
-`CARE.bat` is the whole setup: pull if behind, heal Bitwig/REAPER/Renoise +
-Mackie template, rewrite **Cursor / Claude Code / Claude CLI / Claude Desktop**
-MCP configs to this clone, Desktop shortcut, start shared Bitwig SSE `:8080`,
-health check. Restart IDEs once. Open DAWs. Ride.
+Or open **`launch_daw_mcp.bat`** / Desktop **DAW Horsemen** → GUI → **CARE**.
 
-MCP servers + bridges:
+That heals agents + DAWs, starts shared Bitwig SSE `:8080`, writes the Desktop
+shortcut, and shows health. Restart Cursor / Claude once. Ride.
 
 | Horseman | DAW | Path | Rides on |
 |---|---|---|---|
 | Death | REAPER | `packages/reaper-mcp/` | Python + Lua bridge |
 | War | Bitwig | `packages/bitwig-mcp-server/` | Python + OSC (DawpocalypseMCP) |
 | Pestilence | Renoise | `packages/renoise-mcp-bridge/` | Node → ReMCP (HTTP) |
-| Famine | Reason | `packages/reason/` | No MCP of its own — rides inside REAPER (Rack Plugin) |
-| (desk) | Behringer X-Touch | `packages/mackie-xtouch/` | MCU MIDI via DawpocalypseMCP / REAPER Mackie — not a separate MCP |
+| Famine | Reason | `packages/reason/` | Rack Plugin inside REAPER |
+| (desk) | Behringer X-Touch | `packages/mackie-xtouch/` | MCU MIDI on **Bitwig** (default) |
 
-**This repo is the source of truth.** Machines install from it and update from it.
+Version: `VERSION`. Showcase: `docs/index.html`. Detail: `IDE_SETUP.txt` / `SETUP.txt`.
 
-Version: see `VERSION`. Showcase: `docs/index.html`. IDE detail: `IDE_SETUP.txt`.
+## GUI launcher (default)
 
-## Install notes
+- `launcher_gui.py` — health pills, CARE/update/heal, start stacks, live log
+- `launch_daw_mcp.bat` — starts the GUI (pythonw)
+- `launch_daw_mcp_cli.bat` — old text menu
+- Desktop: **DAW Horsemen** (and legacy **DAW MCP Launchers**)
 
-`INSTALL.bat` = deps + heal (no SSE auto-start). **CARE is preferred.**
+## Update
 
-## Update (any machine)
+GUI → **UPDATE from GitHub**, or `UPDATE.bat`, or CARE again.
 
-```bat
-UPDATE.bat
-```
-
-Checks GitHub, pulls if behind, refreshes deps. Or just run `CARE.bat` again.
-
-## Launchers (DAWs + MCPs)
-
-After install, use the Desktop shortcut or:
-
-```bat
-launch_daw_mcp.bat
-```
-
-Menu can start Bitwig / REAPER / Renoise **and** their MCP side, run a health
-check (`scripts\health_check.ps1`), INSTALL, UPDATE, or CARE. Recreate the shortcut
-anytime: `powershell -File scripts\make_desktop_shortcut.ps1`
-
-## Bitwig: ONE shared server, many clients
-
-Bitwig's OSC controller talks to **one** process. Don't let every MCP client
-spawn its own server — run the shared one and point everybody at it:
+## Bitwig: one shared server
 
 ```bat
 packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat
 ```
 
-Then every client (Claude CLI, Cursor, Claude Desktop/Cowork, VS Code MCP
-extensions) uses: `http://127.0.0.1:8080/sse` — full story in
-`packages/bitwig-mcp-server/SHARED_SERVER.md` and **`IDE_SETUP.txt`**.
-
-**Yes — shared Bitwig MCP works across all agents on the machine** as long as
-each client points at that SSE URL (not `python -m bitwig_mcp_server` stdio).
-REAPER / Renoise stay stdio-per-client (no single OSC port to fight over).
+Every agent: `http://127.0.0.1:8080/sse` — see `SHARED_SERVER.md` + `IDE_SETUP.txt`.
 
 ## Dev flow
 
@@ -111,9 +85,9 @@ This pack assembles and wires other people's work. Credit belongs upstream:
   for control still goes to TwelveTake's REAPER MCP above.
 
 ### Desk — Behringer X-Touch / Mackie
-- MCU MIDI surface support comes from **DrivenByMoss** (MCU - Control Universal)
-  in Bitwig, and REAPER's built-in Mackie Control. Templates in
-  `packages/mackie-xtouch/` are pack convenience only.
+- Default owner: **Bitwig** via DrivenByMoss **MCU - Control Universal**
+  (CARE disables REAPER Mackie so Windows MIDI does not clash). See
+  `packages/mackie-xtouch/SETUP_MACKIE.txt`.
 
 ### This pack
 - Shared Bitwig SSE server, CARE/INSTALL/heal, launchers, IDE wiring, docs —

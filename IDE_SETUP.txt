@@ -1,19 +1,17 @@
 IDE + MCP SETUP (Cursor / Claude / Claude CLI / VS Code / Desktop)
 =================================================================
-OUT OF THE BOX: run CARE.bat once. It heals Cursor, Claude Code/CLI,
-Claude Desktop, Bitwig/REAPER/Renoise bridges, starts shared Bitwig SSE,
-and makes the Desktop shortcut. Then restart each IDE once.
+OUT OF THE BOX: run CARE.bat  OR  open the GUI (launch_daw_mcp.bat /
+Desktop "DAW Horsemen") and click CARE. That heals Cursor, Claude Code/CLI,
+Claude Desktop, Bitwig/REAPER/Renoise, starts shared Bitwig SSE, and shows
+health in the GUI. Then restart each IDE once.
 
-After CARE you get: Desktop shortcut "DAW MCP Launchers".
-Use that to start DAWs + MCP. Detail below if something drifts.
+GUI = health pills + live log + start DAWs. Old text menu: launch_daw_mcp_cli.bat
 
 GOLDEN RULE - BITWIG
 --------------------
 Bitwig must be ONE shared server (all agents share it):
 
-  1. Launchers menu -> "Bitwig Studio + SHARED MCP"
-     OR packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat
-     (CARE.bat starts this if it was down)
+  1. GUI -> "Bitwig + shared SSE"  OR  CARE (starts SSE if down)
   2. Every IDE points bitwig at:  http://127.0.0.1:8080/sse
   3. Do NOT add "python -m bitwig_mcp_server" as a second client
      (that fights UDP 9001 and breaks everyone).
@@ -21,8 +19,7 @@ Bitwig must be ONE shared server (all agents share it):
 REAPER + RENOISE are fine as stdio (each IDE can spawn its own).
 
 Copy-paste template:  mcp.json.example  (in this folder).
-CARE/INSTALL also writes  mcp.generated.json  with THIS machine's absolute paths
-AND patches your agent configs automatically.
+CARE also writes  mcp.generated.json  AND patches your agent configs.
 
 
 1) CURSOR

@@ -1,74 +1,43 @@
 THE DAW HORSEMEN MCP PACK -- SETUP
 ==================================
 GitHub: aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack
-Version: see VERSION (stamp on each release)
+Version: see VERSION
 
-Out of the box (any machine)
+Out of the box (streamlined)
 ----------------------------
-  git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
-  cd DAW-Horsemen
-  CARE.bat
+  1. git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
+  2. cd DAW-Horsemen
+  3. CARE.bat
+        OR double-click launch_daw_mcp.bat / Desktop "DAW Horsemen"
+           -> GUI -> button "CARE — update + heal + SSE"
+  4. Restart Cursor / Claude Desktop once
+  5. Open DAWs (GUI Start buttons, or Desktop launcher)
 
-CARE.bat = update-if-behind + heal agents+DAWs + Mackie + shortcut +
-           start shared Bitwig SSE + health.
-  Heals Cursor / Claude Code / Claude CLI / Claude Desktop MCP configs,
-  Bitwig DawpocalypseMCP + OSC 8005/9001, REAPER lua, Renoise ReMCP.
-
-Then: restart IDEs once. Open DAWs. IDE_SETUP.txt only if something drifts.
-
-INSTALL.bat = deps + heal. UPDATE.bat = git pull + heal.
-RELEASE.bat = maintainer ZIP + GitHub release.
-
+CARE / GUI CARE does: git pull if behind, heal Bitwig/REAPER/Renoise + agent
+MCP configs, free X-Touch for Bitwig, Desktop shortcut, shared SSE :8080,
+health check.
 
 Day-to-day
 ----------
-  Desktop shortcut OR  launch_daw_mcp.bat
-    H = health check
-    1 = Bitwig + shared MCP (SSE :8080)   <-- required for multi-agent Bitwig
-    2 = REAPER + bridge
-    3 = Renoise + ReMCP wake
-    4 = all three
+  Desktop "DAW Horsemen"  = GUI (health pills + log + start/CARE)
+  launch_daw_mcp_cli.bat  = old text menu (optional)
 
-  Updates:  UPDATE.bat
+  GUI health shows: Bitwig / REAPER / Renoise / SSE :8080 / ReMCP :19714 / Git
 
+Bitwig agents (all IDEs)
+------------------------
+  http://127.0.0.1:8080/sse
+  Details only if something drifts: IDE_SETUP.txt
 
-What rides what
----------------
-  REAPER   packages/reaper-mcp/            Python MCP + Lua bridge
-  RENOISE  packages/renoise-mcp-bridge/    Node bridge -> ReMCP in Renoise
-  BITWIG   packages/bitwig-mcp-server/     Shared SSE MCP + DawpocalypseMCP OSC
-                                           (DrivenByMoss fork; recv 8005 / send 9001)
-  REASON   packages/reason/                No own MCP - use REAPER + Rack Plugin
+X-Touch
+-------
+  Default owner = Bitwig (DrivenByMoss MCU). See packages\mackie-xtouch\SETUP_MACKIE.txt
 
+Showcase
+--------
+  docs\index.html   (GUI: Open showcase page)
 
-Bitwig shared server (important)
---------------------------------
-  Run ONE: packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat
-  Every IDE uses: http://127.0.0.1:8080/sse
-  Never spawn a second python -m bitwig_mcp_server for another IDE.
-  Details: packages\bitwig-mcp-server\SHARED_SERVER.md
-
-
-Files to know
--------------
-  IDE_SETUP.txt           how to wire Cursor / Claude / CLI / VS Code
-  mcp.json.example        template (placeholders)
-  mcp.generated.json      written by INSTALL (machine paths)
-  launch_daw_mcp.bat      menu
-  scripts\health_check.ps1
-  docs\index.html         showcase page
-  README.md               install + full upstream CREDITS
-
-
-Credits (upstream authors)
---------------------------
-  REAPER MCP     TwelveTake Studios LLC   https://github.com/TwelveTake/reaper-mcp
-  Bitwig MCP     John Stanford (jxstanford) https://github.com/jxstanford/bitwig-mcp-server
-  DrivenByMoss   Jürgen Moßgraber         https://www.mossgrabers.de/
-                 (OSC/MCU; DawpocalypseMCP is a renamed fork of that surface)
-  ReMCP Renoise  kraken (kraken@renoise.com)
-                 https://www.renoise.com/tools/renoise-mcp
-                 also renoise/tools (PR by kunitoki)
-  Pack tooling   aday (+ Claude) — shared SSE, CARE/INSTALL/heal, launchers
-
-  Each package keeps its own LICENSE. See README.md Credits section.
+Maintainers
+-----------
+  RELEASE.bat   ZIP + GitHub release
+  PUBLISH.bat   git push

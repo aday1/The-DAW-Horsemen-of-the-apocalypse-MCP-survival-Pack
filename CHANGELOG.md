@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.5.0 — "GUI Launcher" (2026-07-18)
+- **`launcher_gui.py`**: Tkinter GUI — CARE / heal / update / start stacks,
+  live **health pills** (Bitwig, REAPER, Renoise, SSE, ReMCP, git), scrolling
+  **log**. Default entry via `launch_daw_mcp.bat` (pythonw).
+- Desktop shortcut **DAW Horsemen** (+ legacy **DAW MCP Launchers**) → GUI.
+- Old text menu kept as `launch_daw_mcp_cli.bat`.
+- `scripts/health_status.py`: shared Python health for GUI + CLI.
+- SETUP/README streamlined: GitHub clone → CARE (or GUI CARE button).
+
 ## 2.4.0 — "Out Of The Box" (2026-07-18)
 - **CARE.bat = one-shot OOTB**: heal agents + DAWs, Desktop shortcut, start
   shared Bitwig SSE if down, health check. No manual MCP paste required.
