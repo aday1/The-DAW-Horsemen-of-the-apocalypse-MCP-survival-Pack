@@ -55,14 +55,8 @@ echo  [3] Desktop shortcut...
 %PS% -File "%PACK%\scripts\make_desktop_shortcut.ps1" -PackRoot "%PACK%"
 
 echo.
-echo  [4] Shared Bitwig SSE ^(required for every agent^)...
-%PS% -Command ^
-  "$sse = Get-CimInstance Win32_Process -EA SilentlyContinue | Where-Object { $_.CommandLine -match 'serve_sse' };" ^
-  "if ($sse) { Write-Host '      already up PID' ($sse.ProcessId -join ','); exit 0 };" ^
-  "Write-Host '      starting run_bitwig_mcp_shared.bat ...';" ^
-  "Start-Process cmd.exe -ArgumentList '/k','cd /d \"%PACK%\packages\bitwig-mcp-server\" && run_bitwig_mcp_shared.bat';" ^
-  "Start-Sleep -Seconds 2;" ^
-  "try { (Invoke-WebRequest http://127.0.0.1:8080/healthz -UseBasicParsing -TimeoutSec 3).Content } catch { Write-Host '      waiting for healthz...' }"
+echo  [4] Shared Bitwig SSE (required for every agent)...
+%PS% -File "%PACK%\scripts\ensure_shared_sse.ps1" "%PACK%"
 
 echo.
 echo  [5] Health check...
@@ -72,17 +66,16 @@ echo.
 echo  ============================================================
 echo   CARE DONE - OUT OF THE BOX
 echo  ============================================================
-echo   Agents healed: Cursor (.cursor/mcp.json), Claude Code/CLI (.mcp.json),
-echo                  Claude Desktop (mcp-remote -^> :8080/sse)
+echo   Agents healed: Cursor, Claude Code/CLI, Claude Desktop
 echo   DAWs healed:   Bitwig DawpocalypseMCP + OSC 8005/9001,
 echo                  REAPER lua bridge, Renoise ReMCP tip, Mackie template
 echo   Shared SSE:    http://127.0.0.1:8080/sse
 echo.
 echo   YOU STILL DO ONCE:
 echo     - Restart Cursor / Claude Desktop / open a fresh Claude CLI session
-echo     - Open Bitwig: Controllers -^> DawpocalypseMCP OSC on
+echo     - Open Bitwig: Controllers - DawpocalypseMCP OSC on
 echo     - Open REAPER: run reaper_mcp_bridge.lua if not auto-started
-echo     - Open Renoise: Tools -^> Renoise MCP -^> Start
+echo     - Open Renoise: Tools - Renoise MCP - Start
 echo     - Day-to-day: Desktop "DAW MCP Launchers"
 echo.
 if /i "%CARE_NOPAUSE%"=="1" exit /b 0
