@@ -4,142 +4,573 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The DAW Horsemen of the Apocalypse — MCP Survival Pack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0709; --panel:#151015; --edge:#2d1f2d;
-    --blood:#c2283c; --bone:#e8ddc8; --ash:#8a7f8a; --gold:#d4a017;
-    --war:#c2283c; --death:#9aa5b1; --pest:#7bb661; --famine:#d4a017;
+    --bg:#09060a;
+    --panel:#140f14;
+    --panel2:#1a1218;
+    --edge:#3a2834;
+    --blood:#d12b3f;
+    --blood-dim:#7a1824;
+    --bone:#ece2cf;
+    --ash:#9a8f96;
+    --gold:#d4a017;
+    --death:#a8b4c0;
+    --war:#d12b3f;
+    --pest:#6fbf6a;
+    --famine:#e0b03a;
+    --font-display:"Cinzel",Georgia,serif;
+    --font-body:"Source Serif 4",Georgia,serif;
+    --font-mono:"IBM Plex Mono",Consolas,monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--bg);color:var(--bone);font-family:Georgia,'Times New Roman',serif;line-height:1.6;overflow-x:hidden}
-  .noise{position:fixed;inset:0;pointer-events:none;opacity:.05;
-    background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,#fff 2px,#fff 3px)}
-  header{text-align:center;padding:70px 20px 40px;position:relative;
-    background:radial-gradient(ellipse at 50% -20%, #2d1020 0%, var(--bg) 65%)}
-  h1{font-size:clamp(1.6rem,5vw,3.2rem);letter-spacing:.06em;color:var(--bone);
-    text-shadow:0 0 24px rgba(194,40,60,.55)}
-  h1 .red{color:var(--blood)}
-  .horses{font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:.4em;margin:14px 0 6px}
-  .tag{color:var(--ash);font-style:italic;font-size:1.05rem}
-  .seals{margin-top:22px}
-  .seals a{display:inline-block;margin:6px 8px;padding:10px 22px;border:1px solid var(--edge);
-    color:var(--bone);text-decoration:none;background:var(--panel);letter-spacing:.08em;font-size:.95rem;
-    transition:all .2s}
-  .seals a:hover{border-color:var(--blood);box-shadow:0 0 16px rgba(194,40,60,.4);transform:translateY(-2px)}
-  main{max-width:1060px;margin:0 auto;padding:30px 20px 80px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin:34px 0}
-  .card{background:var(--panel);border:1px solid var(--edge);padding:26px 22px;position:relative;transition:all .25s}
-  .card:hover{transform:translateY(-4px)}
-  .card .icon{font-size:2.6rem;display:block;margin-bottom:10px}
-  .card h3{letter-spacing:.12em;font-size:1.15rem;margin-bottom:2px}
-  .card .daw{font-size:1.35rem;margin-bottom:10px;font-weight:bold}
-  .card p{color:var(--ash);font-size:.92rem}
-  .card code{display:block;margin-top:12px;font-size:.78rem;color:var(--bone);background:#0d0a0d;
-    padding:6px 8px;border-left:3px solid var(--edge);font-family:Consolas,monospace;overflow-x:auto}
-  .war{border-top:3px solid var(--war)} .war:hover{box-shadow:0 8px 24px rgba(194,40,60,.25)}
-  .death{border-top:3px solid var(--death)} .death:hover{box-shadow:0 8px 24px rgba(154,165,177,.25)}
-  .pest{border-top:3px solid var(--pest)} .pest:hover{box-shadow:0 8px 24px rgba(123,182,97,.25)}
-  .famine{border-top:3px solid var(--famine)} .famine:hover{box-shadow:0 8px 24px rgba(212,160,23,.25)}
-  h2{margin:46px 0 14px;letter-spacing:.1em;color:var(--bone);border-bottom:1px solid var(--edge);padding-bottom:8px}
-  .rite{background:var(--panel);border:1px solid var(--edge);border-left:4px solid var(--blood);
-    padding:18px 20px;margin:14px 0;font-family:Consolas,monospace;font-size:.9rem;overflow-x:auto;white-space:pre}
-  .rite b{color:var(--gold)}
-  p.lore{color:var(--ash);margin:10px 0}
-  p.lore b{color:var(--bone)}
-  .credits{font-size:.9rem;color:var(--ash)}
-  .credits a{color:var(--bone)}
-  footer{text-align:center;padding:40px 20px;color:var(--ash);font-size:.85rem;border-top:1px solid var(--edge)}
-  .pulse{animation:pulse 3s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:.85}50%{opacity:1}}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--bone);
+    font-family:var(--font-body);line-height:1.65;
+    overflow-x:hidden;
+  }
+  a{color:var(--bone)}
+  a:hover{color:var(--gold)}
+
+  /* atmosphere */
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.07;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .scan{
+    position:fixed;inset:0;pointer-events:none;z-index:89;opacity:.04;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.55) 3px);
+  }
+
+  /* ---- HERO ---- */
+  .hero{
+    position:relative;min-height:100vh;min-height:100dvh;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:0 0 4.5rem;
+    overflow:hidden;
+  }
+  .hero-stage{
+    position:absolute;inset:0;z-index:0;
+    background:
+      radial-gradient(ellipse 80% 55% at 50% -10%, #3a1020 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 85% 70%, rgba(111,191,106,.12) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 35% at 10% 80%, rgba(168,180,192,.1) 0%, transparent 45%),
+      linear-gradient(180deg, #12080e 0%, var(--bg) 100%);
+  }
+  .hero-vis{
+    position:absolute;inset:0;z-index:1;
+    display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+    opacity:.55;pointer-events:none;
+  }
+  .hv{position:relative;overflow:hidden;border:1px solid rgba(58,40,52,.35)}
+  .hv::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(to top, var(--bg) 0%, transparent 45%);
+  }
+
+  /* tracker hex grid (Renoise) */
+  .hv-tracker{
+    background:#0c0a0c;
+    font-family:var(--font-mono);font-size:11px;color:#4a7a48;
+    line-height:1.35;padding:10px 8px;letter-spacing:.02em;
+  }
+  .hv-tracker .row{white-space:pre;opacity:.85}
+  .hv-tracker .row b{color:var(--pest);font-weight:500}
+  .hv-tracker .hl{background:rgba(111,191,106,.15);color:var(--pest)}
+  .playhead-t{
+    position:absolute;left:0;right:0;height:14px;top:42%;
+    background:rgba(111,191,106,.18);border-top:1px solid var(--pest);
+    animation:scanrow 4.5s linear infinite;z-index:2;
+  }
+  @keyframes scanrow{0%{top:18%}100%{top:78%}}
+
+  /* Bitwig clip launcher pads */
+  .hv-clips{
+    display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);
+    gap:6px;padding:14px;background:#10080c;
+  }
+  .clip{
+    border-radius:3px;border:1px solid #3a2030;
+    background:linear-gradient(145deg,#2a1520,#180c12);
+    position:relative;overflow:hidden;
+  }
+  .clip.on{
+    border-color:var(--blood);
+    background:linear-gradient(145deg,#5a1a28,#2a0c14);
+    box-shadow:0 0 12px rgba(209,43,63,.35);
+    animation:clippulse 2.2s ease-in-out infinite;
+  }
+  .clip.on:nth-child(3){animation-delay:.4s}
+  .clip.on:nth-child(6){animation-delay:.8s}
+  .clip.on:nth-child(11){animation-delay:1.1s}
+  .clip .bar{
+    position:absolute;left:0;bottom:0;height:3px;width:40%;
+    background:var(--blood);animation:fillbar 2.2s ease-in-out infinite;
+  }
+  @keyframes clippulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+  @keyframes fillbar{0%{width:10%}50%{width:90%}100%{width:10%}}
+
+  /* REAPER envelope */
+  .hv-env{background:#0b0d10;padding:0}
+  .hv-env svg{width:100%;height:100%;display:block}
+  .env-line{fill:none;stroke:var(--death);stroke-width:2;stroke-linecap:round;
+    stroke-dasharray:600;stroke-dashoffset:600;animation:drawenv 6s ease-in-out infinite}
+  @keyframes drawenv{
+    0%{stroke-dashoffset:600;opacity:.5}
+    40%{stroke-dashoffset:0;opacity:1}
+    70%{stroke-dashoffset:0;opacity:1}
+    100%{stroke-dashoffset:-40;opacity:.6}
+  }
+  .env-dot{fill:var(--bone);opacity:.9}
+
+  /* Reason rack / famine */
+  .hv-rack{
+    background:#100c08;padding:12px;display:flex;flex-direction:column;gap:8px;
+  }
+  .rack-slot{
+    height:22%;border:1px solid #4a3a20;background:linear-gradient(90deg,#2a2210,#181408);
+    display:flex;align-items:center;padding:0 10px;gap:8px;
+    font-family:var(--font-mono);font-size:10px;color:var(--famine);letter-spacing:.08em;
+  }
+  .rack-slot .led{
+    width:8px;height:8px;border-radius:50%;background:var(--famine);
+    box-shadow:0 0 8px var(--famine);animation:blink 1.8s ease-in-out infinite;
+  }
+  .rack-slot:nth-child(2) .led{animation-delay:.4s}
+  .rack-slot:nth-child(3) .led{animation-delay:.9s}
+  @keyframes blink{0%,100%{opacity:.35}50%{opacity:1}}
+
+  .hero-copy{
+    position:relative;z-index:5;
+    max-width:920px;margin:0 auto;padding:0 24px;
+    text-align:center;
+  }
+  .brand{
+    font-family:var(--font-display);font-weight:700;
+    font-size:clamp(1.85rem,5.5vw,3.6rem);
+    letter-spacing:.08em;line-height:1.15;
+    text-shadow:0 0 40px rgba(209,43,63,.45);
+  }
+  .brand .red{color:var(--blood)}
+  .hero-line{
+    margin-top:1rem;font-size:clamp(1.05rem,2.2vw,1.35rem);
+    color:var(--bone);font-weight:600;letter-spacing:.02em;
+  }
+  .hero-sub{
+    margin-top:.55rem;color:var(--ash);font-style:italic;
+    font-size:clamp(.95rem,1.8vw,1.1rem);max-width:36em;margin-left:auto;margin-right:auto;
+  }
+  .cta{margin-top:1.75rem;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .cta a{
+    display:inline-block;padding:12px 22px;
+    font-family:var(--font-mono);font-size:.85rem;letter-spacing:.1em;
+    text-decoration:none;border:1px solid var(--edge);background:rgba(20,15,20,.85);
+    color:var(--bone);transition:border-color .2s, transform .2s, box-shadow .2s;
+  }
+  .cta a.primary{
+    border-color:var(--blood);background:linear-gradient(180deg,#3a1218,#1a080c);
+  }
+  .cta a:hover{
+    border-color:var(--blood);transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(209,43,63,.3);
+  }
+  .scroll-hint{
+    margin-top:2.2rem;font-family:var(--font-mono);font-size:.72rem;
+    letter-spacing:.2em;color:var(--ash);opacity:.7;
+    animation:pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:.45}50%{opacity:.9}}
+
+  /* ---- LAYOUT ---- */
+  main{position:relative;z-index:2}
+  .band{padding:4.5rem 24px;border-top:1px solid var(--edge)}
+  .band-inner{max-width:1080px;margin:0 auto}
+  .band h2{
+    font-family:var(--font-display);font-weight:700;letter-spacing:.14em;
+    font-size:clamp(1.15rem,2.5vw,1.55rem);margin-bottom:.85rem;
+    color:var(--bone);
+  }
+  .band .lede{
+    color:var(--ash);font-size:1.05rem;max-width:40em;margin-bottom:1.75rem;
+  }
+  .band .lede b{color:var(--bone);font-weight:600}
+
+  /* horseman primers — stacked full sections, not tiny cards */
+  .rider{
+    display:grid;grid-template-columns:minmax(140px,220px) 1fr;
+    gap:28px;align-items:start;
+    padding:2.5rem 0;border-top:1px solid var(--edge);
+  }
+  .rider:first-of-type{border-top:none;padding-top:0}
+  @media (max-width:720px){
+    .rider{grid-template-columns:1fr}
+    .hero-vis{opacity:.35}
+  }
+  .rider-badge{
+    position:relative;min-height:160px;padding:16px;
+    border:1px solid var(--edge);background:var(--panel);
+    overflow:hidden;
+  }
+  .rider-badge .who{
+    font-family:var(--font-display);letter-spacing:.18em;font-size:.78rem;
+    color:var(--ash);margin-bottom:4px;
+  }
+  .rider-badge .daw{
+    font-family:var(--font-display);font-size:1.45rem;font-weight:700;
+    letter-spacing:.06em;margin-bottom:10px;
+  }
+  .rider.death .rider-badge{border-top:3px solid var(--death)}
+  .rider.war .rider-badge{border-top:3px solid var(--war)}
+  .rider.pest .rider-badge{border-top:3px solid var(--pest)}
+  .rider.famine .rider-badge{border-top:3px solid var(--famine)}
+  .rider.death .daw{color:var(--death)}
+  .rider.war .daw{color:var(--war)}
+  .rider.pest .daw{color:var(--pest)}
+  .rider.famine .daw{color:var(--famine)}
+
+  .mini{height:72px;margin-top:8px;border:1px solid rgba(255,255,255,.06);overflow:hidden}
+  .mini-tracker{
+    font-family:var(--font-mono);font-size:9px;line-height:1.3;color:#4a7a48;
+    padding:6px;background:#0a0c0a;white-space:pre;
+  }
+  .mini-clips{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;height:100%;background:#10080c;
+  }
+  .mini-clips i{
+    display:block;border-radius:2px;background:#2a1520;border:1px solid #3a2030;
+  }
+  .mini-clips i.lit{background:#5a1a28;border-color:var(--blood);box-shadow:0 0 6px rgba(209,43,63,.4)}
+  .mini-env{background:#0b0d10;height:100%}
+  .mini-env svg{width:100%;height:100%}
+  .mini-rack{background:#100c08;padding:6px;display:flex;flex-direction:column;gap:4px;height:100%}
+  .mini-rack span{flex:1;border:1px solid #4a3a20;background:#221a0c}
+
+  .rider-body h3{
+    font-family:var(--font-display);font-size:1.05rem;letter-spacing:.1em;
+    margin-bottom:.6rem;color:var(--bone);
+  }
+  .rider-body p{color:var(--ash);margin-bottom:.75rem;font-size:1.02rem}
+  .rider-body p b{color:var(--bone);font-weight:600}
+  .primer{
+    margin:1rem 0 0;padding:14px 16px;
+    background:var(--panel2);border-left:3px solid var(--edge);
+    font-family:var(--font-mono);font-size:.82rem;line-height:1.55;color:var(--ash);
+  }
+  .rider.death .primer{border-color:var(--death)}
+  .rider.war .primer{border-color:var(--war)}
+  .rider.pest .primer{border-color:var(--pest)}
+  .rider.famine .primer{border-color:var(--famine)}
+  .primer strong{color:var(--bone);font-weight:500}
+  .primer ul{margin:.45rem 0 0 1.1em}
+  .primer li{margin:.2rem 0}
+  .path{
+    display:inline-block;margin-top:12px;
+    font-family:var(--font-mono);font-size:.75rem;
+    color:var(--ash);background:#0d0a0d;padding:5px 8px;border:1px solid var(--edge);
+  }
+  .up{font-size:.88rem;color:var(--ash);margin-top:10px}
+  .up a{color:var(--bone);text-decoration:underline;text-underline-offset:3px}
+
+  /* rites */
+  .rite{
+    background:var(--panel);border:1px solid var(--edge);border-left:4px solid var(--blood);
+    padding:18px 20px;margin:14px 0;
+    font-family:var(--font-mono);font-size:.88rem;overflow-x:auto;white-space:pre;line-height:1.55;
+  }
+  .rite b{color:var(--gold);font-weight:500}
+  .note{color:var(--ash);margin:10px 0 0;font-size:.98rem}
+  .note b{color:var(--bone)}
+
+  /* shared war callout */
+  .war-call{
+    position:relative;overflow:hidden;
+    background:
+      linear-gradient(135deg, rgba(209,43,63,.12), transparent 55%),
+      var(--panel);
+    border:1px solid var(--edge);padding:28px 26px;margin-top:8px;
+  }
+  .war-call::before{
+    content:"";position:absolute;right:12px;top:12px;bottom:12px;width:38%;
+    opacity:.35;pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(209,43,63,.15) 18px, rgba(209,43,63,.15) 20px),
+      repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(209,43,63,.1) 18px, rgba(209,43,63,.1) 20px);
+  }
+  .war-call p{position:relative;z-index:1;color:var(--ash);max-width:36em}
+  .war-call p b{color:var(--bone)}
+  .war-call .url{
+    position:relative;z-index:1;margin-top:12px;
+    font-family:var(--font-mono);color:var(--blood);font-size:.95rem;
+  }
+
+  /* credits */
+  .credits-list{
+    list-style:none;margin-top:1rem;
+    display:grid;gap:12px;
+  }
+  .credits-list li{
+    padding:14px 16px;background:var(--panel);border:1px solid var(--edge);
+    font-size:.95rem;color:var(--ash);
+  }
+  .credits-list b{color:var(--bone);font-family:var(--font-display);letter-spacing:.06em;font-size:.85rem;display:block;margin-bottom:4px}
+  .credits-list a{color:var(--bone)}
+
+  footer{
+    text-align:center;padding:2.5rem 20px 3.5rem;
+    color:var(--ash);font-size:.85rem;border-top:1px solid var(--edge);
+    font-style:italic;
+  }
 </style>
 </head>
 <body>
-<div class="noise"></div>
-<header>
-  <div class="horses pulse">🐎 🐎 🐎 🐎</div>
-  <h1>THE <span class="red">DAW HORSEMEN</span> OF THE APOCALYPSE</h1>
-  <p class="tag">MCP Survival Pack — four DAWs, one repo, your AI rides them all.</p>
-  <div class="seals">
-    <a href="https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack">⛧ THE REPO</a>
-    <a href="https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack#install-any-machine">☠ INSTALL</a>
-    <a href="https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack/blob/main/CHANGELOG.md">📜 CHANGELOG</a>
+<div class="grain" aria-hidden="true"></div>
+<div class="scan" aria-hidden="true"></div>
+
+<header class="hero">
+  <div class="hero-stage" aria-hidden="true"></div>
+  <div class="hero-vis" aria-hidden="true">
+    <div class="hv hv-tracker">
+      <div class="playhead-t"></div>
+      <div class="row">00 C-4 01 .. .. A8</div>
+      <div class="row">01 --- .. .. .. ..</div>
+      <div class="row hl">02 D#4 01 .. .. C0</div>
+      <div class="row">03 --- .. .. .. ..</div>
+      <div class="row">04 <b>G-4</b> 02 .. F1 ..</div>
+      <div class="row">05 --- .. .. .. ..</div>
+      <div class="row">06 A#4 01 .. .. A4</div>
+      <div class="row">07 OFF .. .. .. ..</div>
+      <div class="row">08 C-5 01 .. .. ..</div>
+      <div class="row">09 --- .. 0C .. ..</div>
+    </div>
+    <div class="hv hv-clips">
+      <div class="clip"></div><div class="clip on"><span class="bar"></span></div><div class="clip on"><span class="bar"></span></div><div class="clip"></div>
+      <div class="clip"></div><div class="clip on"><span class="bar"></span></div><div class="clip"></div><div class="clip"></div>
+      <div class="clip on"><span class="bar"></span></div><div class="clip"></div><div class="clip on"><span class="bar"></span></div><div class="clip"></div>
+      <div class="clip"></div><div class="clip"></div><div class="clip"></div><div class="clip on"><span class="bar"></span></div>
+    </div>
+    <div class="hv hv-env">
+      <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="envFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#a8b4c0" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#a8b4c0" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M0,160 L40,160 L70,40 L120,40 L160,100 L220,30 L280,30 L320,120 L360,80 L400,80 L400,200 L0,200 Z" fill="url(#envFill)"/>
+        <path class="env-line" d="M0,160 L40,160 L70,40 L120,40 L160,100 L220,30 L280,30 L320,120 L360,80 L400,80"/>
+        <circle class="env-dot" cx="70" cy="40" r="3"/><circle class="env-dot" cx="220" cy="30" r="3"/><circle class="env-dot" cx="320" cy="120" r="3"/>
+      </svg>
+    </div>
+    <div class="hv hv-rack">
+      <div class="rack-slot"><span class="led"></span> COMBINATOR</div>
+      <div class="rack-slot"><span class="led"></span> SUBTRACTOR</div>
+      <div class="rack-slot"><span class="led"></span> SSL MIXER</div>
+      <div class="rack-slot"><span class="led"></span> RACK PLUGIN</div>
+    </div>
+  </div>
+
+  <div class="hero-copy">
+    <h1 class="brand">THE <span class="red">DAW HORSEMEN</span><br>OF THE APOCALYPSE</h1>
+    <p class="hero-line">MCP Survival Pack — four DAWs, one repo, your AI rides them all.</p>
+    <p class="hero-sub">Tracker grids. Clip launchers. Envelope points. Reason racks inside REAPER. Cursor, Claude, and friends on the same wire.</p>
+    <div class="cta">
+      <a class="primary" href="https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack">Open the repo</a>
+      <a href="#summon">Install / CARE</a>
+      <a href="#primers">DAW primers</a>
+      <a href="#credits">Credits</a>
+    </div>
+    <p class="scroll-hint">SCROLL FOR THE RIDE</p>
   </div>
 </header>
-<main>
-  <div class="grid">
-    <div class="card death">
-      <span class="icon">☠️</span>
-      <h3>DEATH</h3><div class="daw">REAPER</div>
-      <p>The pale rider. Tracks, items, MIDI, FX, envelopes, renders — the full harvest. Python server + Lua bridge.</p>
-      <p class="credits">Upstream: <a href="https://github.com/TwelveTake/reaper-mcp">TwelveTake Studios LLC</a></p>
-      <code>packages/reaper-mcp/</code>
-    </div>
-    <div class="card war">
-      <span class="icon">⚔️</span>
-      <h3>WAR</h3><div class="daw">BITWIG</div>
-      <p>Takes peace from the earth — but shares one OSC link. Shared SSE server lets EVERY client ride at once.</p>
-      <p class="credits">Upstream: <a href="https://github.com/jxstanford/bitwig-mcp-server">John Stanford (jxstanford)</a>
-        · OSC/MCU: <a href="https://www.mossgrabers.de/Software/Bitwig/Bitwig.html">Jürgen Moßgraber / DrivenByMoss</a></p>
-      <code>packages/bitwig-mcp-server/</code>
-    </div>
-    <div class="card pest">
-      <span class="icon">🦠</span>
-      <h3>PESTILENCE</h3><div class="daw">RENOISE</div>
-      <p>Spreads through the tracker grid, pattern by pattern. Node bridge into ReMCP running inside Renoise.</p>
-      <p class="credits">Upstream: <a href="https://www.renoise.com/tools/renoise-mcp">ReMCP by kraken</a>
-        (<a href="https://github.com/renoise/tools">renoise/tools</a>)</p>
-      <code>packages/renoise-mcp-bridge/</code>
-    </div>
-    <div class="card famine">
-      <span class="icon">🌾</span>
-      <h3>FAMINE</h3><div class="daw">REASON</div>
-      <p>Has no MCP of its own — it starves. So it rides inside REAPER as a Rack Plugin, and Death carries two.</p>
-      <p class="credits">Control rides TwelveTake REAPER MCP (no separate Reason MCP)</p>
-      <code>packages/reason/</code>
-    </div>
-  </div>
 
-  <h2>THE SUMMONING</h2>
-  <div class="rite"><b>git clone</b> https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
+<main>
+  <section class="band" id="primers" style="background:linear-gradient(180deg,#0e090c 0%,var(--bg) 100%)">
+    <div class="band-inner">
+      <h2>THE FOUR RIDERS</h2>
+      <p class="lede">Each horseman is a real DAW surface your agents can touch — not a metaphor bolted on after the fact. Below: what it feels like, what the MCP can drive, and who built the upstream.</p>
+
+      <article class="rider death">
+        <div class="rider-badge">
+          <div class="who">DEATH</div>
+          <div class="daw">REAPER</div>
+          <div class="mini mini-env" aria-hidden="true">
+            <svg viewBox="0 0 200 72" preserveAspectRatio="none">
+              <path d="M0,55 L30,55 L50,18 L80,18 L100,40 L130,12 L160,12 L180,45 L200,28" fill="none" stroke="#a8b4c0" stroke-width="2"/>
+              <circle cx="50" cy="18" r="2.5" fill="#ece2cf"/><circle cx="130" cy="12" r="2.5" fill="#ece2cf"/>
+            </svg>
+          </div>
+        </div>
+        <div class="rider-body">
+          <h3>ENVELOPES, ITEMS, THE FULL HARVEST</h3>
+          <p>The pale rider does not dabble. Tracks, takes, MIDI notes, FX chains, sends, sidechains, markers, regions, renders — the arrange page as a battlefield map. When an agent draws an <b>envelope</b>, you should feel the point land on the lane, not a vague “set volume” shrug.</p>
+          <p>Python MCP talks to a stock Lua bridge inside REAPER. No mystery network stack: file/HTTP handshake, then 100+ tools aimed at real mixing and writing sessions.</p>
+          <div class="primer">
+            <strong>Primer — what to ask for</strong>
+            <ul>
+              <li>Build a bus, parallel compress a vocal, or wire a kick→bass sidechain in one call</li>
+              <li>Drop MIDI, edit velocities, split items, fade edges, park markers/regions</li>
+              <li>Walk FX params by index, flip presets, arm a render-by-region</li>
+              <li>Ask for <b>get_project_summary</b> when the agent needs the whole desk at once</li>
+            </ul>
+          </div>
+          <span class="path">packages/reaper-mcp/</span>
+          <p class="up">Upstream: <a href="https://github.com/TwelveTake/reaper-mcp">TwelveTake Studios LLC</a> · MIT</p>
+        </div>
+      </article>
+
+      <article class="rider war">
+        <div class="rider-badge">
+          <div class="who">WAR</div>
+          <div class="daw">BITWIG</div>
+          <div class="mini mini-clips" aria-hidden="true">
+            <i></i><i class="lit"></i><i class="lit"></i><i></i>
+            <i></i><i class="lit"></i><i></i><i></i>
+            <i class="lit"></i><i></i><i class="lit"></i><i></i>
+            <i></i><i></i><i></i><i class="lit"></i>
+          </div>
+        </div>
+        <div class="rider-body">
+          <h3>CLIP LAUNCHERS, SCENES, ONE OSC SWORD</h3>
+          <p>War rides the <b>clip launcher</b> grid — scenes firing, pads lighting, transport locked — while the arrange timeline still matters. Bitwig’s OSC controller only answers <b>one</b> process. Spawn a second MCP and you fight over UDP 9001 like rival generals with one radio.</p>
+          <p>This pack’s fix: a shared HTTP-SSE server. Cursor, Claude Code, Claude Desktop, VS Code — all point at the same socket. DrivenByMoss (DawpocalypseMCP fork) holds the OSC lance; the Python MCP swings it.</p>
+          <div class="primer">
+            <strong>Primer — what to ask for</strong>
+            <ul>
+              <li>Transport, tempo, track volume/pan/mute, device parameters</li>
+              <li>Launcher clips &amp; scenes (select, launch, record, duplicate)</li>
+              <li>Device browser / recommend / Poly Grid helpers where indexed</li>
+              <li>Always run <b>run_bitwig_mcp_shared.bat</b> first; agents use <b>http://127.0.0.1:8080/sse</b></li>
+            </ul>
+          </div>
+          <span class="path">packages/bitwig-mcp-server/</span>
+          <p class="up">Upstream: <a href="https://github.com/jxstanford/bitwig-mcp-server">John Stanford (jxstanford)</a> · OSC/MCU: <a href="https://www.mossgrabers.de/Software/Bitwig/Bitwig.html">Jürgen Moßgraber / DrivenByMoss</a></p>
+        </div>
+      </article>
+
+      <article class="rider pest">
+        <div class="rider-badge">
+          <div class="who">PESTILENCE</div>
+          <div class="daw">RENOISE</div>
+          <div class="mini mini-tracker" aria-hidden="true">00 C-4 01 .. A8
+01 --- .. .. ..
+02 D#4 01 .. C0
+03 G-4 02 F1 ..
+04 OFF .. .. ..</div>
+        </div>
+        <div class="rider-body">
+          <h3>PATTERN EDITOR, HEX COLUMNS, PHRASE DISEASE</h3>
+          <p>Pestilence lives in the <b>pattern editor</b> — note columns, instrument numbers, volume/pan/delay hex, effect columns chewing DSP. Agents do not “draw a melody on a piano roll” here; they write tracker language: lines, phrases, pattern order, phrase aliases, instrument slots.</p>
+          <p>ReMCP runs <b>inside</b> Renoise (HTTP). The pack’s Node bridge only translates stdio MCP clients into that stream. Start the tool panel, hit Play if focus-loss starves the server, then let the agent infest the grid.</p>
+          <div class="primer">
+            <strong>Primer — what to ask for</strong>
+            <ul>
+              <li>Song info, BPM/LPB/TPL, transport play/stop/panic</li>
+              <li>Tracks, patterns, sequencer order, instruments, devices</li>
+              <li>Pattern lines &amp; note data the way a tracker musician thinks</li>
+              <li>Renoise: <b>Tools → Renoise MCP → Start</b>; bridge retries until it answers</li>
+            </ul>
+          </div>
+          <span class="path">packages/renoise-mcp-bridge/</span>
+          <p class="up">Upstream: <a href="https://www.renoise.com/tools/renoise-mcp">ReMCP by kraken</a> · <a href="https://github.com/renoise/tools">renoise/tools</a></p>
+        </div>
+      </article>
+
+      <article class="rider famine">
+        <div class="rider-badge">
+          <div class="who">FAMINE</div>
+          <div class="daw">REASON</div>
+          <div class="mini mini-rack" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="rider-body">
+          <h3>NO MCP OF ITS OWN — RIDES THE RACK</h3>
+          <p>Famine starves for a native MCP. So it hitchhikes: load Reason as a <b>Rack Plugin</b> (or Rewire-era habit) inside REAPER, and Death’s tools drive the session around it — tracks, FX outside the rack, MIDI into the rack, renders out.</p>
+          <p>Honest primer: you are not remote-controlling Reason’s Combinator knobs via a Reason-specific protocol. You are producing <b>around</b> Reason with REAPER MCP muscle. That is still a full apocalypse for songwriting.</p>
+          <div class="primer">
+            <strong>Primer — what to ask for</strong>
+            <ul>
+              <li>Create REAPER tracks that host / feed the Reason rack</li>
+              <li>Route MIDI, set up buses, mix the outs beside the rack</li>
+              <li>Keep Reason sound design manual; let the agent own the session scaffolding</li>
+            </ul>
+          </div>
+          <span class="path">packages/reason/</span>
+          <p class="up">Control rides TwelveTake REAPER MCP — no separate Reason MCP upstream</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="band" id="war-shared">
+    <div class="band-inner">
+      <h2>ONE WAR, MANY GENERALS</h2>
+      <div class="war-call">
+        <p>Bitwig’s OSC surface is a single sword. The pack ships <b>run_bitwig_mcp_shared.bat</b> so Claude CLI, Cursor, VS Code MCP extensions, and Claude Desktop all command the same battlefield instead of fistfighting over UDP <b>9001</b>.</p>
+        <p class="url">http://127.0.0.1:8080/sse</p>
+        <p style="margin-top:12px">OSC ports that must stay honest: receive <b>8005</b> / send <b>9001</b> on DawpocalypseMCP (DrivenByMoss Open Sound Control). CARE/INSTALL heal those prefs. Full IDE wiring: <b>IDE_SETUP.txt</b>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="summon" style="background:var(--panel)">
+    <div class="band-inner">
+      <h2>THE SUMMONING</h2>
+      <p class="lede">Clone once. Heal always. Loose copies are heresy — the GitHub repo is the source of truth.</p>
+      <div class="rite"><b>git clone</b> https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
 <b>cd</b> DAW-Horsemen
 <b>CARE.bat</b>       :: pull-if-behind + heal OSC/paths/Mackie + shortcut + health</div>
-  <p class="lore">CARE always heals. INSTALL is deps+heal; UPDATE is git pull+heal.
-  Wire IDEs with <b>IDE_SETUP.txt</b>. X-Touch: <b>packages/mackie-xtouch/SETUP_MACKIE.txt</b>
-  (MCU MIDI beside MCP — not a second MCP server).</p>
+      <p class="note"><b>CARE.bat</b> always heals. <b>INSTALL.bat</b> = deps+heal. <b>UPDATE.bat</b> = git pull+heal.
+      Wire IDEs with <b>IDE_SETUP.txt</b>. Behringer X-Touch is MCU MIDI beside MCP — see <b>packages/mackie-xtouch/SETUP_MACKIE.txt</b>.</p>
+      <div class="rite" style="margin-top:1.5rem"><b>UPDATE.bat</b>      :: checks GitHub, pulls if behind, refreshes deps
+<b>RELEASE.bat</b>     :: maintainer: ZIP + GitHub release from HEAD
+<b>PUBLISH.bat</b>     :: maintainer: push committed work</div>
+    </div>
+  </section>
 
-  <h2>THE PROPHECY (UPDATES)</h2>
-  <div class="rite"><b>UPDATE.bat</b>      :: checks GitHub, pulls if behind, refreshes deps</div>
-  <p class="lore">The repo is the <b>source of truth</b>. Dev happens in the clone; when a version
-  is worthy, it is committed and <b>PUBLISH.bat</b>-ed. Every other machine just runs UPDATE.bat.
-  Loose copies are heresy.</p>
-
-  <h2>ONE WAR, MANY GENERALS</h2>
-  <p class="lore">Bitwig's OSC controller speaks to <b>one</b> process. The pack ships a shared
-  HTTP-SSE server — <b>run_bitwig_mcp_shared.bat</b> — so Claude CLI, Cursor, VS Code MCP
-  extensions and Claude Desktop all command the same battlefield at
-  <b>http://127.0.0.1:8080/sse</b> instead of fighting over UDP 9001. Full IDE wiring:
-  <b>IDE_SETUP.txt</b>.</p>
-
-  <h2>CREDITS (UPSTREAM RIDERS)</h2>
-  <p class="credits">This pack wires other people's work. Full names belong here:</p>
-  <ul class="credits" style="margin:12px 0 0 1.2em;line-height:1.85">
-    <li><b>REAPER MCP</b> — <a href="https://github.com/TwelveTake/reaper-mcp">TwelveTake Studios LLC</a>
-      (<a href="https://twelvetake.com">twelvetake.com</a>) · MIT</li>
-    <li><b>Bitwig MCP</b> — <a href="https://github.com/jxstanford/bitwig-mcp-server">John Stanford (jxstanford)</a>
-      · MIT</li>
-    <li><b>DrivenByMoss</b> (OSC + MCU for Bitwig; DawpocalypseMCP fork) —
-      <a href="https://www.mossgrabers.de/Software/Bitwig/Bitwig.html">Jürgen Moßgraber</a>
-      · <a href="https://www.mossgrabers.de/">mossgrabers.de</a></li>
-    <li><b>ReMCP / Renoise MCP</b> — <b>kraken</b> (<a href="mailto:kraken@renoise.com">kraken@renoise.com</a>);
-      tool page <a href="https://www.renoise.com/tools/renoise-mcp">renoise.com/tools/renoise-mcp</a>;
-      also in <a href="https://github.com/renoise/tools">renoise/tools</a> (PR by kunitoki)</li>
-    <li><b>This pack</b> (shared SSE, CARE/INSTALL/heal, launchers, IDE wiring) — aday (+ Claude tooling).
-      Does not replace or relicense the upstreams.</li>
-  </ul>
-  <p class="credits" style="margin-top:14px">Respect each package's LICENSE. Support upstreams where you can
-  (TwelveTake tip jars, DrivenByMoss site, Renoise tools).</p>
+  <section class="band" id="credits">
+    <div class="band-inner">
+      <h2>CREDITS — UPSTREAM RIDERS</h2>
+      <p class="lede">This pack wires other people’s work. Names first; packing second.</p>
+      <ul class="credits-list">
+        <li>
+          <b>REAPER MCP</b>
+          <a href="https://github.com/TwelveTake/reaper-mcp">TwelveTake Studios LLC</a>
+          · <a href="https://twelvetake.com">twelvetake.com</a> · MIT
+        </li>
+        <li>
+          <b>BITWIG MCP</b>
+          <a href="https://github.com/jxstanford/bitwig-mcp-server">John Stanford (jxstanford)</a> · MIT
+        </li>
+        <li>
+          <b>DRIVENBYMOSS</b>
+          <a href="https://www.mossgrabers.de/Software/Bitwig/Bitwig.html">Jürgen Moßgraber</a>
+          — OSC + MCU; DawpocalypseMCP is a renamed fork of that surface ·
+          <a href="https://www.mossgrabers.de/">mossgrabers.de</a>
+        </li>
+        <li>
+          <b>ReMCP / RENOISE MCP</b>
+          kraken (<a href="mailto:kraken@renoise.com">kraken@renoise.com</a>) ·
+          <a href="https://www.renoise.com/tools/renoise-mcp">renoise.com/tools/renoise-mcp</a> ·
+          also <a href="https://github.com/renoise/tools">renoise/tools</a> (PR by kunitoki)
+        </li>
+        <li>
+          <b>THIS PACK</b>
+          Shared SSE, CARE/INSTALL/heal, launchers, IDE wiring — aday (+ Claude tooling).
+          Does not replace or relicense the upstreams. Respect each package LICENSE.
+        </li>
+      </ul>
+    </div>
+  </section>
 </main>
-<footer>And I looked, and behold, four DAWs — and their MIDI followed with them.
-  · Pack: aday1 · Upstream: TwelveTake · jxstanford · Jürgen Moßgraber · kraken · see per-package licenses</footer>
+
+<footer>
+  And I looked, and behold, four DAWs — and their MIDI followed with them.<br>
+  Pack: aday1 · Upstream: TwelveTake · jxstanford · Jürgen Moßgraber · kraken
+</footer>
 </body>
 </html>
