@@ -50,9 +50,15 @@ Write-Host '[installed bridges vs pack]'
 function HashMatch($packPath, $instPath, $label) {
   if (-not (Test-Path -LiteralPath $packPath)) { Bad "$label pack missing"; return }
   if (-not (Test-Path -LiteralPath $instPath)) { Bad "$label NOT installed at $instPath (run INSTALL.bat)"; return }
-  $ha = (Get-FileHash -LiteralPath $packPath).Hash
-  $hb = (Get-FileHash -LiteralPath $instPath).Hash
-  if ($ha -eq $hb) { Ok "$label matches pack" } else { Bad "$label DRIFT vs pack - re-run INSTALL.bat" }
+  # .NET hash — works when Get-FileHash is blocked (constrained language)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $ba = [IO.File]::ReadAllBytes($packPath)
+    $bb = [IO.File]::ReadAllBytes($instPath)
+    $ha = [BitConverter]::ToString($sha.ComputeHash($ba)).Replace('-', '')
+    $hb = [BitConverter]::ToString($sha.ComputeHash($bb)).Replace('-', '')
+  } finally { $sha.Dispose() }
+  if ($ha -eq $hb) { Ok "$label matches pack" } else { Bad "$label DRIFT vs pack - re-run INSTALL.bat / CARE.bat" }
 }
 HashMatch (Join-Path $Pack 'packages\reaper-mcp\reaper_mcp_bridge.lua') `
   (Join-Path $env:APPDATA 'REAPER\Scripts\reaper_mcp_bridge.lua') 'REAPER lua'
