@@ -83,6 +83,15 @@ function Start-ReaperStack {
 
 function Start-RenoiseStack {
   Write-Host '[Renoise]'
+  $sdk = Join-Path $RenoiseDir 'node_modules\@modelcontextprotocol\sdk'
+  if (-not (Test-Path -LiteralPath $sdk)) {
+    Write-Host '  npm install (Renoise bridge deps missing)...'
+    Push-Location $RenoiseDir
+    try {
+      & npm install
+      if ($LASTEXITCODE -ne 0) { throw "npm install failed ($LASTEXITCODE)" }
+    } finally { Pop-Location }
+  }
   Start-IfNeeded 'Renoise' $RenoiseExe | Out-Null
   Write-Host '  Waiting for Renoise UI ...'
   Start-Sleep -Seconds 4

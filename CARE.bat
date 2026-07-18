@@ -35,10 +35,9 @@ if errorlevel 1 (
   echo       [!] pull failed - local edits? Heal will still run.
   goto after_git
 )
-echo       Refreshing pip/npm deps...
+echo       Refreshing pip deps after pull...
 %PY% -m pip install --user -q -r packages\reaper-mcp\requirements.txt
 %PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio pystray pillow
-pushd packages\renoise-mcp-bridge & call npm install --silent & popd
 goto after_git
 
 :no_repo
@@ -50,6 +49,19 @@ echo  [1] git not on PATH - skip pull
 goto after_git
 
 :after_git
+echo.
+echo  [1b] Python + Renoise npm deps (always - MSI has no node_modules)...
+%PY% -m pip install --user -q -r "%PACK%\packages\reaper-mcp\requirements.txt" 2>nul
+%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio pystray pillow 2>nul
+pushd "%PACK%\packages\renoise-mcp-bridge"
+call npm install --silent
+if errorlevel 1 (
+  echo       [!] npm install failed - is Node.js on PATH?
+) else (
+  echo       Renoise bridge node_modules OK
+)
+popd
+
 echo.
 echo  [2] HEAL bridges, Bitwig OSC, Mackie, Cursor/Claude/Desktop MCP paths...
 echo      Close Bitwig if open so prefs patch sticks.

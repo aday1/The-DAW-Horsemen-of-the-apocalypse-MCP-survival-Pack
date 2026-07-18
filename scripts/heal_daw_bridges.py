@@ -16,6 +16,7 @@ import json
 import os
 import shutil
 import struct
+import subprocess
 import sys
 import zipfile
 from pathlib import Path
@@ -299,6 +300,40 @@ def tip_renoise(pack: Path) -> None:
         print("  WARN: no ReMCP tool in pack")
 
 
+def ensure_renoise_npm(pack: Path) -> None:
+    """MSI/ZIP ships without node_modules — npm install once if SDK missing."""
+    bridge = pack / "packages" / "renoise-mcp-bridge"
+    sdk = bridge / "node_modules" / "@modelcontextprotocol" / "sdk"
+    if sdk.exists():
+        print(f"  Renoise npm OK: {sdk.parent.name}")
+        return
+    if not (bridge / "package.json").is_file():
+        print("  WARN: renoise-mcp-bridge/package.json missing")
+        return
+    npm = shutil.which("npm") or shutil.which("npm.cmd")
+    if not npm:
+        print("  WARN: npm not on PATH — install Node.js, then CARE.bat / run_renoise_mcp.bat")
+        return
+    print("  Renoise bridge: npm install (first run / MSI)...")
+    try:
+        r = subprocess.run(
+            [npm, "install"],
+            cwd=str(bridge),
+            capture_output=True,
+            text=True,
+            errors="replace",
+            timeout=180,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+        if r.returncode == 0 and sdk.exists():
+            print("  Renoise npm install OK")
+        else:
+            err = (r.stderr or r.stdout or "").strip()[-200:]
+            print(f"  WARN: npm install exit {r.returncode}: {err}")
+    except Exception as e:
+        print(f"  WARN: npm install failed: {e}")
+
+
 def write_mcp_generated(pack: Path) -> Path:
     doc = {"mcpServers": horsemen_servers(pack, desktop=False)}
     out = pack / "mcp.generated.json"
@@ -509,6 +544,7 @@ def main() -> int:
 
     print("[4] Renoise ReMCP")
     tip_renoise(pack)
+    ensure_renoise_npm(pack)
 
     print("[4b] Mackie / Behringer X-Touch (Bitwig = default owner)")
     disable_reaper_mcu_for_bitwig()

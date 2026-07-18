@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.6.1 — "Renoise npm on MSI" (2026-07-18)
+- MSI ships without `node_modules` — CARE always runs `npm install` for the
+  Renoise bridge (was only after git pull). Heal + `run_renoise_mcp.bat` +
+  start_stack also auto-install if `@modelcontextprotocol/sdk` missing.
+- Fixes `ERR_MODULE_NOT_FOUND` on fresh MSI Renoise bridge launch.
+
 ## 2.6.0 — "Tray Companion" (2026-07-18)
 - **GUI system tray**: close / minimise hides to tray (not exit). Double-click
   tray icon to restore. Tray menu: Show, health, update check, CARE, SSE, Quit.

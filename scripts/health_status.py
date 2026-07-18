@@ -196,6 +196,7 @@ def collect(pack: Path | None = None) -> HealthReport:
         "packages/reaper-mcp/reaper_mcp_bridge.lua",
         "packages/renoise-mcp-bridge/bridge.js",
         "packages/renoise-mcp-bridge/com.renoise.ReMCP_v0.1_api6.xrnx",
+        "packages/renoise-mcp-bridge/node_modules/@modelcontextprotocol/sdk/package.json",
         "drivebymossvaday.bwextension",
         "launcher_gui.py",
     ]
