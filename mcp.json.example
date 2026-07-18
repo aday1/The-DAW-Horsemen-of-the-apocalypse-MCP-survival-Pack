@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "bitwig": {
+      "url": "http://127.0.0.1:8080/sse"
+    },
+    "reaper": {
+      "command": "python",
+      "args": [
+        "REPLACE_WITH_PACK_ROOT/packages/reaper-mcp/reaper_mcp_server.py"
+      ]
+    },
+    "renoise": {
+      "command": "node",
+      "args": [
+        "REPLACE_WITH_PACK_ROOT/packages/renoise-mcp-bridge/bridge.js"
+      ],
+      "cwd": "REPLACE_WITH_PACK_ROOT/packages/renoise-mcp-bridge",
+      "env": {
+        "RENOISE_MCP_URL": "http://127.0.0.1:19714/mcp"
+      }
+    }
+  }
+}

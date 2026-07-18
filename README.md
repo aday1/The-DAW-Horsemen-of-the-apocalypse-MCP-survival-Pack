@@ -22,7 +22,12 @@ INSTALL.bat
 ```
 
 `INSTALL.bat` installs deps (pip + npm), drops the Bitwig extension and REAPER
-Lua bridge into place, and prints ready-to-paste MCP config for this machine.
+Lua bridge into place, installs/opens the Renoise ReMCP tool, **creates a
+Desktop shortcut "DAW MCP Launchers"**, and writes `mcp.generated.json` with
+absolute paths for this clone.
+
+**Wire your IDE next:** read **`IDE_SETUP.txt`** (Cursor, Claude Code, Claude
+CLI, VS Code, Claude Desktop/Cowork). Template: `mcp.json.example`.
 
 ## Update (any machine)
 
@@ -34,15 +39,15 @@ Checks GitHub, pulls if behind, refreshes deps. That's the whole updater.
 
 ## Launchers (DAWs + MCPs)
 
-Desktop / day-to-day:
+After install, use the Desktop shortcut or:
 
 ```bat
 launch_daw_mcp.bat
 ```
 
 Menu can start Bitwig / REAPER / Renoise **and** their MCP side, run a health
-check (`scripts\health_check.ps1`), INSTALL, or UPDATE. Root jam-machine
-`E:\ChiptuneClaude\launch_daw_mcp.bat` is a thin wrapper that calls this one.
+check (`scripts\health_check.ps1`), INSTALL, or UPDATE. Recreate the shortcut
+anytime: `powershell -File scripts\make_desktop_shortcut.ps1`
 
 ## Bitwig: ONE shared server, many clients
 
@@ -53,8 +58,9 @@ spawn its own server — run the shared one and point everybody at it:
 packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat
 ```
 
-Then every client (Claude CLI, Cursor, Claude Desktop/Cowork) uses:
-`http://127.0.0.1:8080/sse` — full story in `packages/bitwig-mcp-server/SHARED_SERVER.md`.
+Then every client (Claude CLI, Cursor, Claude Desktop/Cowork, VS Code MCP
+extensions) uses: `http://127.0.0.1:8080/sse` — full story in
+`packages/bitwig-mcp-server/SHARED_SERVER.md` and **`IDE_SETUP.txt`**.
 
 **Yes — shared Bitwig MCP works across all agents on the machine** as long as
 each client points at that SSE URL (not `python -m bitwig_mcp_server` stdio).

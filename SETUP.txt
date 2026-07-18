@@ -1,49 +1,57 @@
-THE DAW HORSEMEN MCP PACK -- TLDR SETUP
-========================================
+THE DAW HORSEMEN MCP PACK -- SETUP
+==================================
+GitHub: aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack
 
-You get four DAW paths in one repo:
+Fresh machine
+-------------
+  git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
+  cd DAW-Horsemen
+  INSTALL.bat
 
-  REAPER    -> packages/reaper-mcp/
-  RENOISE   -> packages/renoise-mcp-bridge/   (+ Renoise ReMCP running inside Renoise)
-  BITWIG    -> packages/bitwig-mcp-server/   (+ DrivenByMoss / OSC in Bitwig)
-  REASON    -> packages/reason/              (no separate MCP: use REAPER + Reason Rack Plugin)
+INSTALL.bat does:
+  - pip + npm deps
+  - Bitwig .bwextension into Documents\Bitwig Studio\Extensions
+  - REAPER lua into %APPDATA%\REAPER\Scripts
+  - offers Renoise ReMCP .xrnx install
+  - creates Desktop shortcut "DAW MCP Launchers"
+  - writes mcp.generated.json with absolute paths for your clone
 
-Per DAW (do only what you use):
+Then read:  IDE_SETUP.txt   (Cursor, Claude Code, Claude CLI, VS Code, Desktop)
 
-1) REAPER
-   - Copy packages/reaper-mcp/reaper_mcp_bridge.lua into %APPDATA%\REAPER\Scripts\
-   - REAPER: Actions -> Load ReaScript -> Run that file
-   - pip install -r packages/reaper-mcp/requirements.txt
-   - Cursor MCP: python packages/reaper-mcp/reaper_mcp_server.py (see package README for env)
 
-2) RENOISE
-   - Install/start the Renoise ReMCP tool so HTTP MCP is up (often port 19714)
-   - cd packages/renoise-mcp-bridge && npm install
-   - Cursor MCP: node bridge.js with cwd = that folder
+Day-to-day
+----------
+  Desktop shortcut OR  launch_daw_mcp.bat
+    H = health check
+    1 = Bitwig + shared MCP (SSE :8080)   <-- required for multi-agent Bitwig
+    2 = REAPER + bridge
+    3 = Renoise + ReMCP wake
+    4 = all three
 
-3) BITWIG
-   - Install DrivenByMoss (or your OSC build), add OSC controller, Receive 8005 / Send 9001 match env
-   - cd packages/bitwig-mcp-server && uv sync   (or pip install -e .)
-   - Cursor MCP: python -m bitwig_mcp_server with cwd = that folder
+  Updates:  UPDATE.bat
 
-4) REASON
-   - Open Reason inside REAPER as Reason Rack Plugin on a track; control the session with REAPER MCP.
 
-Optional: PowerShell script scripts/extract_to_machine.ps1 copies Bitwig server into your Bitwig Extensions folder.
+What rides what
+---------------
+  REAPER   packages/reaper-mcp/            Python MCP + Lua bridge
+  RENOISE  packages/renoise-mcp-bridge/    Node bridge -> ReMCP in Renoise
+  BITWIG   packages/bitwig-mcp-server/     Shared SSE MCP + DrivenByMoss OSC
+  REASON   packages/reason/                No own MCP - use REAPER + Rack Plugin
 
-Dashboard env (optional): REAPER_MCP_DASHBOARD=1, RENOISE_MCP_DASHBOARD=1, BITWIG_MCP_DASHBOARD=1
 
-Install help tools (no DAW needed): get_reaper_mcp_install_guide, get_bitwig_mcp_install_guide
+Bitwig shared server (important)
+--------------------------------
+  Run ONE: packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat
+  Every IDE uses: http://127.0.0.1:8080/sse
+  Never spawn a second python -m bitwig_mcp_server for another IDE.
+  Details: packages\bitwig-mcp-server\SHARED_SERVER.md
 
-SHARED BITWIG SERVER (v2)
--------------------------
-Run packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat (ONE instance).
-Every MCP client then connects to http://127.0.0.1:8080/sse -- no more
-port 9001 fights between Cursor / Claude CLI / Desktop.
-Details: packages/bitwig-mcp-server/SHARED_SERVER.md
 
-INSTALL / UPDATE
-----------------
-Fresh machine: git clone ... DAW-Horsemen, then INSTALL.bat
-Updates:       UPDATE.bat   (git pull + deps refresh)
-Dev machine:   edit, test, commit, PUBLISH.bat
+Files to know
+-------------
+  IDE_SETUP.txt           how to wire Cursor / Claude / CLI / VS Code
+  mcp.json.example        template (placeholders)
+  mcp.generated.json      written by INSTALL (machine paths)
+  launch_daw_mcp.bat      menu
+  scripts\health_check.ps1
+  docs\index.html         showcase page

@@ -96,7 +96,10 @@
   <h2>THE SUMMONING</h2>
   <div class="rite"><b>git clone</b> https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
 <b>cd</b> DAW-Horsemen
-<b>INSTALL.bat</b>     :: deps + Bitwig extension + REAPER bridge + your config paths</div>
+<b>INSTALL.bat</b>     :: deps + DAW bridges + Desktop shortcut + mcp.generated.json</div>
+  <p class="lore">INSTALL creates a Desktop shortcut <b>DAW MCP Launchers</b>. Wire Cursor /
+  Claude / Claude CLI / VS Code using <b>IDE_SETUP.txt</b> and paste from
+  <b>mcp.generated.json</b>. Bitwig for every IDE: <b>http://127.0.0.1:8080/sse</b>.</p>
 
   <h2>THE PROPHECY (UPDATES)</h2>
   <div class="rite"><b>UPDATE.bat</b>      :: checks GitHub, pulls if behind, refreshes deps</div>
@@ -106,8 +109,10 @@
 
   <h2>ONE WAR, MANY GENERALS</h2>
   <p class="lore">Bitwig's OSC controller speaks to <b>one</b> process. The pack ships a shared
-  HTTP-SSE server — <b>run_bitwig_mcp_shared.bat</b> — so Claude CLI, Cursor and Claude Desktop
-  all command the same battlefield at <b>http://127.0.0.1:8080/sse</b> instead of fighting over UDP 9001.</p>
+  HTTP-SSE server — <b>run_bitwig_mcp_shared.bat</b> — so Claude CLI, Cursor, VS Code MCP
+  extensions and Claude Desktop all command the same battlefield at
+  <b>http://127.0.0.1:8080/sse</b> instead of fighting over UDP 9001. Full IDE wiring:
+  <b>IDE_SETUP.txt</b>.</p>
 
   <h2>CREDITS</h2>
   <p class="credits">Built on the shoulders of upstream riders:

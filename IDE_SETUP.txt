@@ -1,0 +1,114 @@
+IDE + MCP SETUP (Cursor / Claude / Claude CLI / VS Code / Desktop)
+=================================================================
+After INSTALL.bat you get a Desktop shortcut: "DAW MCP Launchers".
+Use that to start DAWs + MCP. Then wire each IDE to the same servers.
+
+GOLDEN RULE - BITWIG
+--------------------
+Bitwig must be ONE shared server (all agents share it):
+
+  1. Launchers menu -> "Bitwig Studio + SHARED MCP"
+     OR packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat
+  2. Every IDE points bitwig at:  http://127.0.0.1:8080/sse
+  3. Do NOT add "python -m bitwig_mcp_server" as a second client
+     (that fights UDP 9001 and breaks everyone).
+
+REAPER + RENOISE are fine as stdio (each IDE can spawn its own).
+
+Copy-paste template:  mcp.json.example  (in this folder).
+INSTALL.bat also writes  mcp.generated.json  with THIS machine's absolute paths.
+
+
+1) CURSOR
+---------
+A) Project (recommended if this folder is the workspace root):
+   - Copy mcp.json.example -> .cursor/mcp.json
+   - OR Settings -> MCP -> add servers from mcp.generated.json
+B) Bitwig entry must be URL form:
+     "bitwig": { "url": "http://127.0.0.1:8080/sse" }
+C) Start shared Bitwig MCP (Launchers menu 1 or 5).
+D) Settings -> MCP -> toggle bitwig off/on if it shows disconnected.
+E) Ask: "run bitwig_diagnose" / "get project summary in reaper"
+
+
+2) CLAUDE CODE  (claude in a terminal, project folder)
+---------------
+A) Put mcp.json.example contents into project root as .mcp.json
+   (or merge the three servers into an existing .mcp.json).
+B) Open/trust this folder in Claude Code.
+C) Enable the servers if prompted (bitwig, reaper, renoise).
+   On disk this is projects["<path>"].enabledMcpjsonServers in ~/.claude.json
+D) Restart the Claude Code session after editing .mcp.json.
+E) Start Bitwig shared SSE before using Bitwig tools.
+
+
+3) CLAUDE CLI  (claude / claude-cli same project model)
+-------------
+Same as Claude Code: project .mcp.json + enable servers + shared Bitwig SSE.
+From the pack folder:
+
+  claude
+
+Then: /mcp  (or your CLI's MCP status) to confirm bitwig/reaper/renoise listed.
+
+
+4) CLAUDE DESKTOP / COWORK
+--------------------------
+A) Open Claude Desktop -> Settings -> Developer -> Edit Config
+   (claude_desktop_config.json), OR add a custom connector.
+B) Prefer URL for Bitwig:
+     "bitwig": { "url": "http://127.0.0.1:8080/sse" }
+   If the UI only accepts a command, use the stdio shim:
+     npx -y mcp-remote http://127.0.0.1:8080/sse
+C) For reaper/renoise paste the command blocks from mcp.generated.json
+   (absolute paths to THIS clone).
+D) Fully quit + reopen Claude Desktop after edits.
+E) Start shared Bitwig SSE before chatting.
+
+
+5) VS CODE
+----------
+Depends which MCP client extension you use (GitHub Copilot MCP, Continue,
+Cline, Roo, etc.). Pattern is the same JSON:
+
+  - Bitwig:  { "url": "http://127.0.0.1:8080/sse" }
+  - Reaper:  python.exe  <pack>\packages\reaper-mcp\reaper_mcp_server.py
+  - Renoise: node  <pack>\packages\renoise-mcp-bridge\bridge.js
+             cwd = that folder, env RENOISE_MCP_URL=http://127.0.0.1:19714/mcp
+
+Put it where THAT extension documents (often .vscode/mcp.json, or user
+settings "mcp.servers"). Start shared Bitwig SSE first.
+
+
+DAW SIDE (once per session)
+---------------------------
+BITWIG
+  - Controllers: DrivenByMoss "Open Sound Control"
+  - Receive 8005 / Send 9001 / host 127.0.0.1
+  - Toggle controller OFF/ON after starting shared SSE if tools time out
+
+REAPER
+  - Launchers menu starts REAPER + reaper_mcp_bridge.lua
+  - Or Actions -> Load ReaScript -> reaper_mcp_bridge.lua -> Run
+
+RENOISE
+  - Tools -> Renoise MCP -> START (port 19714)
+  - Press Play (ReMCP often stops answering when unfocused unless playing)
+  - Launchers menu 3 tries to wake this automatically
+
+
+VERIFY
+------
+  Launchers menu -> H  (health check)
+  Or:  powershell -File scripts\health_check.ps1
+
+  Bitwig live:  http://127.0.0.1:8080/healthz
+  Renoise:      http://127.0.0.1:19714/health  (when ReMCP started)
+
+
+MORE DETAIL
+-----------
+  SETUP.txt                              pack overview
+  packages\bitwig-mcp-server\SHARED_SERVER.md
+  packages\*\SETUP_*.txt                 per-DAW notes
+  docs\index.html                        showcase page

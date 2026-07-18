@@ -38,6 +38,8 @@ echo   8. Renoise MCP bridge window
 echo.
 echo   --- Notes / install ---
 echo   9. Open Bitwig shared-server notes
+echo   D. Recreate Desktop shortcut
+echo   E. Open IDE_SETUP.txt  (Cursor / Claude / CLI / VS Code)
 echo   I. Run INSTALL.bat (sync bridges into DAWs)
 echo   U. Run UPDATE.bat (git pull from GitHub)
 echo.
@@ -55,6 +57,8 @@ if /i "%CHOICE%"=="6" goto bitwig_stop
 if /i "%CHOICE%"=="7" goto reaper_mcp
 if /i "%CHOICE%"=="8" goto renoise_mcp
 if /i "%CHOICE%"=="9" goto bitwig_notes
+if /i "%CHOICE%"=="D" goto desktop
+if /i "%CHOICE%"=="E" goto ide_setup
 if /i "%CHOICE%"=="I" goto install
 if /i "%CHOICE%"=="U" goto update
 if /i "%CHOICE%"=="Q" exit /b 0
@@ -115,6 +119,20 @@ if exist "%PACK%packages\bitwig-mcp-server\SHARED_SERVER.md" (
   start "" notepad "%PACK%packages\bitwig-mcp-server\SHARED_SERVER.md"
 ) else (
   echo Missing SHARED_SERVER.md
+  pause
+)
+goto menu
+
+:desktop
+%PS% -File "%SCRIPTS%\make_desktop_shortcut.ps1" -PackRoot "%PACK%"
+pause
+goto menu
+
+:ide_setup
+if exist "%PACK%IDE_SETUP.txt" (
+  start "" notepad "%PACK%IDE_SETUP.txt"
+) else (
+  echo Missing IDE_SETUP.txt
   pause
 )
 goto menu

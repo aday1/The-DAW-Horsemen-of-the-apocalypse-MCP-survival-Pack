@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.0 — "Generals Get a Shortcut" (2026-07-18)
+- `INSTALL.bat` creates Desktop shortcut **DAW MCP Launchers**, writes
+  `mcp.generated.json` with absolute paths, opens Renoise ReMCP xrnx if missing.
+- New **`IDE_SETUP.txt`**: Cursor, Claude Code, Claude CLI, VS Code, Claude
+  Desktop/Cowork — how to wire MCPs; Bitwig always `http://127.0.0.1:8080/sse`.
+- `mcp.json.example`, `scripts/make_desktop_shortcut.ps1`,
+  `scripts/write_mcp_generated.ps1`; launcher menu D/E for shortcut + IDE docs.
+- SETUP.txt / README / docs showcase updated for GitHub newcomers.
+
 ## 2.0.0 — "War Never Shares a Port" (2026-07-18)
 - **Shared Bitwig server**: `serve_sse.py` + `run_bitwig_mcp_shared.bat` — one
   process owns the OSC link (8005/9001), all MCP clients connect via
