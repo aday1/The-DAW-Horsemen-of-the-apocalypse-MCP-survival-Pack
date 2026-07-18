@@ -20,7 +20,7 @@ echo  Now at version: %NEWVER%
 echo  Refreshing deps + healing bridges/paths for THIS machine...
 where py >nul 2>nul && set "PY=py" || set "PY=python"
 %PY% -m pip install --user -q -r packages\reaper-mcp\requirements.txt
-%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio
+%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio pystray pillow
 pushd packages\renoise-mcp-bridge & call npm install --silent & popd
 %PY% "%~dp0scripts\heal_daw_bridges.py"
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\make_desktop_shortcut.ps1" -PackRoot "%~dp0"

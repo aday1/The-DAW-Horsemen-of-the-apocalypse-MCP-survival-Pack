@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.6.0 — "Tray Companion" (2026-07-18)
+- **GUI system tray**: close / minimise hides to tray (not exit). Double-click
+  tray icon to restore. Tray menu: Show, health, update check, CARE, SSE, Quit.
+- **Ports row**: SSE :8080, OSC UDP :8005/:9001, monitor :8765, ReMCP :19714.
+- **Update pill**: polls GitHub latest release (MSI + git installs). Auto every
+  15 min. MSI users get release page (no git pull).
+- Tray tooltip = short health + version. Icon ring green/amber/red.
+- CARE/INSTALL/UPDATE pip: `pystray` + `pillow` (GUI can also auto-install once).
+- `health_status.py`: ports snapshot, GitHub update check, MSI-friendly git/agents.
+
 ## 2.5.2 — "MSI CARE polish" (2026-07-18)
 - Heal no longer writes `.mcp.json` into `%LOCALAPPDATA%\Programs\` when installed via MSI.
 - Health check treats missing `.git` as Info (MSI/ZIP), not BAD.

@@ -21,7 +21,7 @@ where node >nul 2>nul || echo  [!] node not found - Renoise bridge install will 
 
 echo  [1/7] Python deps (REAPER + Bitwig)...
 %PY% -m pip install --user -q -r packages\reaper-mcp\requirements.txt
-%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio
+%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio pystray pillow
 
 echo  [2/7] Node deps (Renoise bridge)...
 pushd packages\renoise-mcp-bridge

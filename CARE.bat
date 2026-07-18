@@ -37,7 +37,7 @@ if errorlevel 1 (
 )
 echo       Refreshing pip/npm deps...
 %PY% -m pip install --user -q -r packages\reaper-mcp\requirements.txt
-%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio
+%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio pystray pillow
 pushd packages\renoise-mcp-bridge & call npm install --silent & popd
 goto after_git
 

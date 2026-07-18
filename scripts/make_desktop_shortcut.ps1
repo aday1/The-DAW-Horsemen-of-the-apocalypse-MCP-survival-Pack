@@ -55,7 +55,7 @@ if ($pyw) {
   $sc.WorkingDirectory = $PackRoot
 }
 $sc.WindowStyle = 1
-$sc.Description = 'DAW Horsemen GUI — CARE/update, start DAWs+MCP, health + log'
+$sc.Description = 'DAW Horsemen GUI — tray companion, CARE/update, health + ports'
 $sc.IconLocation = 'C:\Windows\System32\shell32.dll,165'
 $sc.Save()
 Write-Host "Desktop shortcut OK: $lnkPath"

@@ -19,10 +19,12 @@ health check.
 
 Day-to-day
 ----------
-  Desktop "DAW Horsemen"  = GUI (health pills + log + start/CARE)
+  Desktop "DAW Horsemen"  = GUI (tray companion: health + ports + update)
+                            Close/minimise hides to tray. Quit from tray menu.
   launch_daw_mcp_cli.bat  = old text menu (optional)
+  launch_daw_mcp.bat --tray via:  pythonw launcher_gui.py --tray
 
-  GUI health shows: Bitwig / REAPER / Renoise / SSE :8080 / ReMCP :19714 / Git
+  GUI shows: DAWs / SSE / ReMCP / Update + ports 8080, 8005, 9001, 8765, 19714
 
 Bitwig agents (all IDEs)
 ------------------------

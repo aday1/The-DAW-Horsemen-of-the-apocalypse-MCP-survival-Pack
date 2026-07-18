@@ -27,7 +27,8 @@ Version: `VERSION`. Showcase: `docs/index.html`. Detail: `IDE_SETUP.txt` / `SETU
 
 ## GUI launcher (default)
 
-- `launcher_gui.py` — health pills, CARE/update/heal, start stacks, live log
+- `launcher_gui.py` — tray companion: health + ports + GitHub update, CARE/stacks, live log
+  (close/minimise → system tray; `--tray` starts hidden)
 - `launch_daw_mcp.bat` — starts the GUI (pythonw)
 - `launch_daw_mcp_cli.bat` — old text menu
 - Desktop: **DAW Horsemen** (and legacy **DAW MCP Launchers**)

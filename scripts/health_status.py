@@ -146,42 +146,47 @@ def collect(pack: Path | None = None) -> HealthReport:
     pack = (pack or pack_root()).resolve()
     rep = HealthReport(pack=str(pack))
 
-    # git
-    try:
-        remote = subprocess.check_output(
-            ["git", "-C", str(pack), "remote", "get-url", "origin"],
-            text=True,
-            errors="replace",
-            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-        ).strip()
-        ok = "The-DAW-Horsemen" in remote or "DAW-Horsemen" in remote
-        rep.add("git", "origin", ok, remote)
-    except Exception as e:
-        rep.add("git", "origin", False, str(e)[:100])
+    # git — MSI/ZIP installs have no .git; that is Info, not a hard fail for GUI
+    git_dir = pack / ".git"
+    if not git_dir.exists():
+        rep.add("git", "origin", True, "MSI/ZIP install (no .git)")
+        rep.add("git", "sync with origin/main", True, "use GitHub Releases to update")
+    else:
+        try:
+            remote = subprocess.check_output(
+                ["git", "-C", str(pack), "remote", "get-url", "origin"],
+                text=True,
+                errors="replace",
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            ).strip()
+            ok = "The-DAW-Horsemen" in remote or "DAW-Horsemen" in remote
+            rep.add("git", "origin", ok, remote)
+        except Exception as e:
+            rep.add("git", "origin", False, str(e)[:100])
 
-    try:
-        subprocess.check_call(
-            ["git", "-C", str(pack), "fetch", "origin", "--quiet"],
-            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-            timeout=30,
-        )
-        counts = subprocess.check_output(
-            ["git", "-C", str(pack), "rev-list", "--left-right", "--count", "origin/main...HEAD"],
-            text=True,
-            errors="replace",
-            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-        ).strip()
-        synced = counts in ("0\t0", "0 0", "0\t0\n")
-        rep.add("git", "sync with origin/main", synced, counts.replace("\t", " / "))
-        head = subprocess.check_output(
-            ["git", "-C", str(pack), "rev-parse", "--short", "HEAD"],
-            text=True,
-            errors="replace",
-            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-        ).strip()
-        rep.add("git", "HEAD", True, head)
-    except Exception as e:
-        rep.add("git", "sync", False, str(e)[:100])
+        try:
+            subprocess.check_call(
+                ["git", "-C", str(pack), "fetch", "origin", "--quiet"],
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                timeout=30,
+            )
+            counts = subprocess.check_output(
+                ["git", "-C", str(pack), "rev-list", "--left-right", "--count", "origin/main...HEAD"],
+                text=True,
+                errors="replace",
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            ).strip()
+            synced = counts in ("0\t0", "0 0", "0\t0\n")
+            rep.add("git", "sync with origin/main", synced, counts.replace("\t", " / "))
+            head = subprocess.check_output(
+                ["git", "-C", str(pack), "rev-parse", "--short", "HEAD"],
+                text=True,
+                errors="replace",
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            ).strip()
+            rep.add("git", "HEAD", True, head)
+        except Exception as e:
+            rep.add("git", "sync with origin/main", False, str(e)[:100])
 
     # packages
     need = [
@@ -243,13 +248,38 @@ def collect(pack: Path | None = None) -> HealthReport:
         str(remcp) if remcp.exists() else "missing",
     )
 
-    # agents
-    jam = pack.parent
-    for label, path in (
-        (".mcp.json", jam / ".mcp.json"),
-        (".cursor/mcp.json", jam / ".cursor" / "mcp.json"),
-    ):
+    # agents — pack-local always; jam only when parent is a real project
+    agent_paths: list[tuple[str, Path]] = [
+        ("pack/.mcp.json", pack / ".mcp.json"),
+        ("pack/.cursor/mcp.json", pack / ".cursor" / "mcp.json"),
+    ]
+    parent = pack.parent
+    if parent.name.lower() != "programs":
+        agent_paths.extend(
+            [
+                (".mcp.json", parent / ".mcp.json"),
+                (".cursor/mcp.json", parent / ".cursor" / "mcp.json"),
+            ]
+        )
+    jam = Path(r"E:\ChiptuneClaude")
+    if jam.is_dir() and jam.resolve() != pack.resolve():
+        agent_paths.extend(
+            [
+                ("jam/.mcp.json", jam / ".mcp.json"),
+                ("jam/.cursor/mcp.json", jam / ".cursor" / "mcp.json"),
+            ]
+        )
+    seen_agent: set[str] = set()
+    for label, path in agent_paths:
+        key = str(path.resolve()) if path.exists() else str(path)
+        if key in seen_agent:
+            continue
+        seen_agent.add(key)
         if not path.is_file():
+            # Missing jam configs are soft; pack configs matter more
+            soft = label.startswith("jam/") or label.startswith(".")
+            if soft:
+                continue
             rep.add("agents", label, False, "missing")
             continue
         try:
@@ -288,7 +318,187 @@ def collect(pack: Path | None = None) -> HealthReport:
         remcp_body if remcp_ok else "start Tools -> Renoise MCP",
     )
 
+    # ports snapshot as named checks (GUI pills)
+    for p in ports_snapshot():
+        # OSC free is normal when Bitwig off — do not count as health failure
+        soft = p["name"].startswith("OSC ") and not p["ok"]
+        if soft:
+            rep.checks.append(
+                Check(name=p["name"], ok=True, detail=f"{p['detail']} (Bitwig off OK)", group="ports")
+            )
+        else:
+            rep.add("ports", p["name"], p["ok"], p["detail"])
+
+    # update — available update is news, not a health failure
+    upd = check_github_update(pack)
+    rep.checks.append(
+        Check(
+            name="GitHub release",
+            ok=True,
+            detail=upd["detail"],
+            group="update",
+        )
+    )
+
     return rep
+
+
+# Known Horsemen wire map (for tray tooltip + GUI)
+PORT_DEFS: list[dict[str, Any]] = [
+    {"name": "SSE :8080", "kind": "http", "url": "http://127.0.0.1:8080/healthz", "role": "shared Bitwig MCP"},
+    {"name": "OSC recv :8005", "kind": "udp", "port": 8005, "role": "Bitwig OSC in (DrivenByMoss)"},
+    {"name": "OSC send :9001", "kind": "udp", "port": 9001, "role": "Bitwig OSC out (one owner)"},
+    {"name": "monitor :8765", "kind": "tcp", "port": 8765, "role": "Bitwig MCP monitor"},
+    {"name": "ReMCP :19714", "kind": "http", "url": "http://127.0.0.1:19714/health", "role": "Renoise ReMCP"},
+]
+
+
+def _udp_in_use(port: int, host: str = "127.0.0.1") -> bool:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.bind((host, port))
+        return False
+    except OSError:
+        return True
+    finally:
+        s.close()
+
+
+def ports_snapshot() -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for d in PORT_DEFS:
+        if d["kind"] == "http":
+            ok, body = _http_ok(d["url"])
+            out.append(
+                {
+                    "name": d["name"],
+                    "ok": ok,
+                    "detail": body if ok else "down",
+                    "role": d["role"],
+                }
+            )
+        elif d["kind"] == "udp":
+            ok = _udp_in_use(int(d["port"]))
+            out.append(
+                {
+                    "name": d["name"],
+                    "ok": ok,
+                    "detail": "bound" if ok else "free",
+                    "role": d["role"],
+                }
+            )
+        else:
+            ok = _tcp_listen(int(d["port"]))
+            out.append(
+                {
+                    "name": d["name"],
+                    "ok": ok,
+                    "detail": "listen" if ok else "closed",
+                    "role": d["role"],
+                }
+            )
+    return out
+
+
+def local_version(pack: Path | None = None) -> str:
+    pack = (pack or pack_root()).resolve()
+    vf = pack / "VERSION"
+    if vf.is_file():
+        return vf.read_text(encoding="utf-8").strip()
+    return "0.0.0"
+
+
+def _parse_ver(s: str) -> tuple[int, ...]:
+    s = s.strip().lstrip("vV")
+    parts: list[int] = []
+    for p in s.split("."):
+        try:
+            parts.append(int("".join(ch for ch in p if ch.isdigit()) or "0"))
+        except ValueError:
+            parts.append(0)
+    while len(parts) < 3:
+        parts.append(0)
+    return tuple(parts[:4])
+
+
+def check_github_update(pack: Path | None = None) -> dict[str, Any]:
+    """Compare local VERSION to GitHub latest release (works for MSI + git clone)."""
+    pack = (pack or pack_root()).resolve()
+    local = local_version(pack)
+    api = (
+        "https://api.github.com/repos/aday1/"
+        "The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack/releases/latest"
+    )
+    try:
+        req = urllib.request.Request(
+            api,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "DAW-Horsemen-GUI",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=8) as r:
+            data = json.loads(r.read().decode("utf-8", errors="replace"))
+        tag = str(data.get("tag_name") or "").strip()
+        remote = tag.lstrip("vV")
+        url = str(data.get("html_url") or "")
+        msi = ""
+        for a in data.get("assets") or []:
+            name = str(a.get("name") or "")
+            if name.lower().endswith(".msi"):
+                msi = str(a.get("browser_download_url") or "")
+                break
+        available = _parse_ver(remote) > _parse_ver(local)
+        detail = f"local {local} / latest {remote}"
+        if available:
+            detail += " - UPDATE available"
+        else:
+            detail += " - current"
+        return {
+            "available": available,
+            "local": local,
+            "remote": remote,
+            "tag": tag,
+            "url": url,
+            "msi_url": msi,
+            "detail": detail,
+            "ok": True,
+        }
+    except Exception as e:
+        return {
+            "available": False,
+            "local": local,
+            "remote": "",
+            "tag": "",
+            "url": "",
+            "msi_url": "",
+            "detail": f"check failed: {str(e)[:100]}",
+            "ok": False,
+        }
+
+
+def tray_summary(rep: HealthReport, upd: dict[str, Any] | None = None) -> str:
+    """Short multiline string for tray tooltip (Windows ~127 char soft limit — keep tight)."""
+    by = {c.name: c for c in rep.checks}
+    bits = []
+    for name, short in (
+        ("Bitwig shared SSE :8080", "SSE"),
+        ("Renoise ReMCP :19714", "ReMCP"),
+        ("Bitwig", "BW"),
+        ("REAPER", "RP"),
+        ("Renoise", "RN"),
+    ):
+        c = by.get(name)
+        if c:
+            bits.append(f"{short}:{'OK' if c.ok else 'NO'}")
+    line1 = " ".join(bits) if bits else "health?"
+    if upd and upd.get("available"):
+        line2 = f"UPD {upd.get('local')}->{upd.get('remote')}"
+    else:
+        line2 = f"v{upd.get('local') if upd else local_version()}"
+    # tooltip max ~128 on classic tray
+    s = f"Horsemen {line2} | {line1}"
+    return s[:120]
 
 
 def format_report(rep: HealthReport) -> str:
