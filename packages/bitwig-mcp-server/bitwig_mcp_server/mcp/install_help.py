@@ -45,7 +45,7 @@ _INTRO = """## Bitwig MCP Server -- install overview
 1. Python 3.10+ on PATH.
 2. Install this package (uv recommended): in the repo root run `uv sync` or `pip install -e .`.
 3. Install DrivenByMoss (or a VAday-labeled OSC build) in Bitwig and add the Open Sound Control controller.
-4. Match UDP ports: MCP sends TO Bitwig on the port Bitwig listens on (often 8000); Bitwig must SEND TO the port MCP listens on (often 9000). Override with BITWIG_MCP_BITWIG_SEND_PORT and BITWIG_MCP_BITWIG_RECEIVE_PORT if needed.
+4. Match UDP ports: MCP sends TO Bitwig on the port Bitwig listens on (often 8005); Bitwig must SEND TO the port MCP listens on (often 9001). Override with BITWIG_MCP_BITWIG_SEND_PORT and BITWIG_MCP_BITWIG_RECEIVE_PORT if needed.
 5. Register the server in Cursor (or Claude Desktop) MCP settings and start Bitwig before using tools that need OSC.
 6. Call MCP tool `bitwig_diagnose` to confirm `/transport/tempo` and project name are non-null after refresh."""
 
@@ -84,8 +84,8 @@ Use the folder that contains `pyproject.toml`. If `python` is not on PATH, use t
 
 Optional env vars:
 
-- BITWIG_MCP_BITWIG_SEND_PORT -- UDP port Bitwig listens on (default 8000)
-- BITWIG_MCP_BITWIG_RECEIVE_PORT -- port this process listens on for Bitwig (default 9000)
+- BITWIG_MCP_BITWIG_SEND_PORT -- UDP port Bitwig listens on (default 8005)
+- BITWIG_MCP_BITWIG_RECEIVE_PORT -- port this process listens on for Bitwig (default 9001)
 - BITWIG_MCP_BROWSER_INDEX_DIR -- override Chroma index directory
 - BITWIG_MCP_DASHBOARD=1 -- localhost reference UI (default port 3848)
 - BITWIG_MCP_DASHBOARD_PORT -- dashboard TCP port"""
@@ -96,7 +96,7 @@ _BITWIG_OSC = """## Bitwig Studio controller setup
 2. Restart Bitwig.
 3. Settings > Controllers > Add > choose the Open Sound Control / OSC entry (menu title may show hardware model name).
 4. Set Bitwig to receive OSC on the same port MCP sends to (default 8000).
-5. Set Bitwig to send OSC to 127.0.0.1 on the same port MCP listens on (default 9000).
+5. Set Bitwig to send OSC to 127.0.0.1 on the same port MCP listens on (default 9001).
 6. Enable the controller.
 
 If `bitwig_diagnose` shows tempo/project as None, the send-from-Bitwig side is wrong or the firewall is blocking UDP."""

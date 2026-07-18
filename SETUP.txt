@@ -22,7 +22,7 @@ Per DAW (do only what you use):
    - Cursor MCP: node bridge.js with cwd = that folder
 
 3) BITWIG
-   - Install DrivenByMoss (or your OSC build), add OSC controller, ports 8000/9000 match env
+   - Install DrivenByMoss (or your OSC build), add OSC controller, Receive 8005 / Send 9001 match env
    - cd packages/bitwig-mcp-server && uv sync   (or pip install -e .)
    - Cursor MCP: python -m bitwig_mcp_server with cwd = that folder
 
@@ -34,3 +34,16 @@ Optional: PowerShell script scripts/extract_to_machine.ps1 copies Bitwig server 
 Dashboard env (optional): REAPER_MCP_DASHBOARD=1, RENOISE_MCP_DASHBOARD=1, BITWIG_MCP_DASHBOARD=1
 
 Install help tools (no DAW needed): get_reaper_mcp_install_guide, get_bitwig_mcp_install_guide
+
+SHARED BITWIG SERVER (v2)
+-------------------------
+Run packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat (ONE instance).
+Every MCP client then connects to http://127.0.0.1:8080/sse -- no more
+port 9001 fights between Cursor / Claude CLI / Desktop.
+Details: packages/bitwig-mcp-server/SHARED_SERVER.md
+
+INSTALL / UPDATE
+----------------
+Fresh machine: git clone ... DAW-Horsemen, then INSTALL.bat
+Updates:       UPDATE.bat   (git pull + deps refresh)
+Dev machine:   edit, test, commit, PUBLISH.bat

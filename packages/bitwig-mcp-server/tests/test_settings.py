@@ -22,8 +22,8 @@ def test_settings_defaults():
     assert settings.app_tagline == "MCP server for Bitwig Studio."
     assert settings.log_level == "INFO"
     assert settings.bitwig_host == "127.0.0.1"
-    assert settings.bitwig_send_port == 8000
-    assert settings.bitwig_receive_port == 9000
+    assert settings.bitwig_send_port == 8005
+    assert settings.bitwig_receive_port == 9001
     assert settings.mcp_port == 8080
 
 

@@ -47,10 +47,10 @@ class Settings(BaseSettings):
         default="127.0.0.1", description="Bitwig Studio host address"
     )
     bitwig_send_port: int = Field(
-        default=8000, description="Port to send OSC messages to Bitwig"
+        default=8005, description="Port to send OSC messages to Bitwig"
     )
     bitwig_receive_port: int = Field(
-        default=9000, description="Port to receive OSC messages from Bitwig"
+        default=9001, description="Port to receive OSC messages from Bitwig"
     )
     osc_bank_page_size: int = Field(
         default=64,

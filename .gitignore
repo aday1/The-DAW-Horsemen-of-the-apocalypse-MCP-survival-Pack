@@ -30,3 +30,7 @@ dependency-reduced-pom.xml
 
 # Logs
 *.log
+
+# Pack runtime junk
+publish_log.txt
+packages/renoise-mcp-bridge/package-lock.json

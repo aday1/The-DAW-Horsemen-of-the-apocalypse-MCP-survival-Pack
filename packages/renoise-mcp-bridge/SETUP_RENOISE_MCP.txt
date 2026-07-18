@@ -1,0 +1,43 @@
+RENOISE MCP — finish setup (2 steps, ~1 minute)
+================================================
+Almost nothing left — I already did the fiddly parts:
+  * The Renoise "ReMCP" tool is ALREADY installed in your Renoise
+    (%APPDATA%\Renoise\V3.5.4\Scripts\Tools\com.renoise.ReMCP.xrnx).
+  * The Node bridge + its node_modules are placed here (no npm needed):
+      E:\ChiptuneClaude\renoise-mcp\bridge.js  (+ node_modules, 91 pkgs)
+  * The combined server list is in  E:\ChiptuneClaude\.mcp.json
+    (it now defines BOTH "reaper" and "renoise").
+
+STEP 1 — start the MCP server inside Renoise (each Renoise session)
+  In Renoise: Tools menu -> "Renoise MCP"  (opens the control panel dialog).
+  Click START.  Default port is 19714.  It should listen on  http://127.0.0.1:19714/mcp
+  (The dialog also has a "Claude setup" helper if you want to double-check.)
+
+STEP 2 — register in Cowork + restart
+  E:\ChiptuneClaude\.mcp.json already lists the "renoise" server:
+      name:    renoise
+      command: node
+      args:    E:\ChiptuneClaude\renoise-mcp\bridge.js
+  If Cowork auto-loads project .mcp.json for this folder, just RESTART Cowork.
+  Otherwise add that server in Cowork's connector / MCP settings, then restart.
+
+  Bridge default port is 19714 (RENOISE_MCP_URL in .mcp.json).  Change the port
+  box in Renoise MCP to match, or override RENOISE_MCP_URL if you use another port.
+
+FOCUS WORKAROUND (required each session)
+  ReMCP stops answering HTTP when Renoise loses focus unless transport is playing.
+  Recipe: port 19714 -> START -> press Play in Renoise -> switch away to Cursor.
+
+VERIFY
+  The bridge retries until Renoise's server is up, so start Renoise's MCP
+  server (STEP 1) BEFORE relying on it. Then say "renoise mcp is live".
+
+WHAT WE'LL DO WITH IT (hybrid Renoise workflow)
+  - I generate .xrns structure with the musicbrain engine (fast, deterministic).
+  - MCP drives Renoise for the things a file can't: load native devices/VSTs,
+    tweak params, trigger renders, read project state back.
+  - Computer-use covers anything the MCP tool set doesn't expose (Serum GUI,
+    wavetable draws), while MCP + generation do the heavy lifting.
+
+Node bridge source: github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack
+Renoise ReMCP tool: bundled in that pack (already installed in your Renoise).

@@ -1,49 +1,64 @@
-# The DAW Horsemen of the Apocalypse MCP Pack
+# 🐎 The DAW Horsemen of the Apocalypse — MCP Survival Pack
 
-One repo bundling Model Context Protocol servers and bridges for **REAPER**, **Renoise**, **Bitwig**, plus notes for **Reason** (via REAPER).
+Four DAWs. One repo. Your AI rides them all.
 
-| Path | What |
-|------|------|
-| `packages/reaper-mcp/` | TwelveTake REAPER MCP (Python + Lua bridge) |
-| `packages/renoise-mcp-bridge/` | Node stdio bridge to Renoise ReMCP (HTTP) |
-| `packages/bitwig-mcp-server/` | Bitwig Studio MCP (Python + OSC / DrivenByMoss) |
-| `packages/reason/` | No standalone MCP — use REAPER + **Reason Rack Plugin** |
+MCP servers + bridges so Claude / Cursor / any MCP client can drive your studio:
 
-## TLDR
+| Horseman | DAW | Path | Rides on |
+|---|---|---|---|
+| ☠️ **Death** | REAPER | `packages/reaper-mcp/` | Python + Lua bridge |
+| ⚔️ **War** | Bitwig | `packages/bitwig-mcp-server/` | Python + OSC (DrivenByMoss) |
+| 🦠 **Pestilence** | Renoise | `packages/renoise-mcp-bridge/` | Node → ReMCP (HTTP) |
+| 🌾 **Famine** | Reason | `packages/reason/` | No MCP of its own — rides inside REAPER (Rack Plugin) |
 
-Read **`SETUP.txt`** (same content, plain text).
+**This repo is the source of truth.** Machines install from it and update from it.
 
-Quick checks:
+## Install (any machine)
 
-- **REAPER:** run Lua bridge, then `get_project_summary` or `get_reaper_mcp_install_guide`.
-- **Renoise:** start ReMCP in Renoise, then `npm install` in `renoise-mcp-bridge` and point Cursor at `node bridge.js`.
-- **Bitwig:** OSC controller on, then `uv sync` in `bitwig-mcp-server` and `python -m bitwig_mcp_server` from Cursor.
-- **Reason:** produce in Reason Rack on a REAPER track; automate through REAPER MCP.
-
-## Extract to default Windows locations
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\extract_to_machine.ps1
+```bat
+git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
+cd DAW-Horsemen
+INSTALL.bat
 ```
 
-Optional: `-BitwigOnly`, `-ReaperScriptsOnly`, `-WhatIf`.
+`INSTALL.bat` installs deps (pip + npm), drops the Bitwig extension and REAPER
+Lua bridge into place, and prints ready-to-paste MCP config for this machine.
 
-## GitHub
+## Update (any machine)
 
-After creating an empty repo named **`The_DAW_Horsemen_of_the_apocalypse_MCP_Pack`**:
-
-```bash
-git remote add origin https://github.com/YOUR_USER/The_DAW_Horsemen_of_the_apocalypse_MCP_Pack.git
-git branch -M main
-git push -u origin main
+```bat
+UPDATE.bat
 ```
 
-## Credits / upstreams
+Checks GitHub, pulls if behind, refreshes deps. That's the whole updater.
 
-- REAPER MCP: TwelveTake fork (see `packages/reaper-mcp/README.md`).
-- Bitwig MCP: based on jxstanford/bitwig-mcp-server lineage; OSC via DrivenByMoss / Bitwig Open Sound Control.
-- Renoise: bridge only; Renoise-side tool is separate (ReMCP).
+## Bitwig: ONE shared server, many clients
 
-## License
+Bitwig's OSC controller talks to **one** process. Don't let every MCP client
+spawn its own server — run the shared one and point everybody at it:
 
-Each package may carry its own license file (MIT, LGPL for DrivenByMoss-derived work, etc.). Respect per-folder `LICENSE` / headers.
+```bat
+packages\bitwig-mcp-server\run_bitwig_mcp_shared.bat
+```
+
+Then every client (Claude CLI, Cursor, Claude Desktop/Cowork) uses:
+`http://127.0.0.1:8080/sse` — full story in `packages/bitwig-mcp-server/SHARED_SERVER.md`.
+
+## Dev flow
+
+Dev happens in the clone (on the dev box: `E:\ChiptuneClaude\DAW-Horsemen`).
+Edit → test → when it's a keeper, commit and `PUBLISH.bat`. Other machines
+`UPDATE.bat`. No loose copies — if it's not in the repo, it doesn't exist.
+
+## Per-DAW quickstarts
+
+Plain-text walkthroughs, one per horseman: `packages/*/SETUP_*.txt` and `SETUP.txt`.
+
+## Credits / upstreams 🙏
+
+- **REAPER MCP** — TwelveTake lineage (see `packages/reaper-mcp/README.md` + LICENSE)
+- **Bitwig MCP** — [jxstanford/bitwig-mcp-server](https://github.com/jxstanford/bitwig-mcp-server) lineage; OSC via **DrivenByMoss** by Jürgen Moßgraber
+- **Renoise** — bridge only; the Renoise-side tool is **ReMCP** (separate project)
+- Local additions (shared SSE server, launchers, pack tooling) by aday + Claude
+
+Each package keeps its own LICENSE — respect them (MIT / LGPL where applicable).

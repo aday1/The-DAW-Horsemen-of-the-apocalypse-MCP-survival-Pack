@@ -28,8 +28,8 @@ class BitwigOSCController:
     def __init__(
         self,
         ip: str = "127.0.0.1",
-        send_port: int = 8000,
-        receive_port: int = 9000,
+        send_port: int = 8005,
+        receive_port: int = 9001,
         connection_timeout: float = 10.0,  # Increased timeout for Bitwig operations
         reconnect_attempts: int = 5,  # More reconnection attempts
         osc_bank_page_size: int = 64,

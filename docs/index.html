@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The DAW Horsemen of the Apocalypse — MCP Survival Pack</title>
+<style>
+  :root{
+    --bg:#0a0709; --panel:#151015; --edge:#2d1f2d;
+    --blood:#c2283c; --bone:#e8ddc8; --ash:#8a7f8a; --gold:#d4a017;
+    --war:#c2283c; --death:#9aa5b1; --pest:#7bb661; --famine:#d4a017;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--bone);font-family:Georgia,'Times New Roman',serif;line-height:1.6;overflow-x:hidden}
+  .noise{position:fixed;inset:0;pointer-events:none;opacity:.05;
+    background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,#fff 2px,#fff 3px)}
+  header{text-align:center;padding:70px 20px 40px;position:relative;
+    background:radial-gradient(ellipse at 50% -20%, #2d1020 0%, var(--bg) 65%)}
+  h1{font-size:clamp(1.6rem,5vw,3.2rem);letter-spacing:.06em;color:var(--bone);
+    text-shadow:0 0 24px rgba(194,40,60,.55)}
+  h1 .red{color:var(--blood)}
+  .horses{font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:.4em;margin:14px 0 6px}
+  .tag{color:var(--ash);font-style:italic;font-size:1.05rem}
+  .seals{margin-top:22px}
+  .seals a{display:inline-block;margin:6px 8px;padding:10px 22px;border:1px solid var(--edge);
+    color:var(--bone);text-decoration:none;background:var(--panel);letter-spacing:.08em;font-size:.95rem;
+    transition:all .2s}
+  .seals a:hover{border-color:var(--blood);box-shadow:0 0 16px rgba(194,40,60,.4);transform:translateY(-2px)}
+  main{max-width:1060px;margin:0 auto;padding:30px 20px 80px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin:34px 0}
+  .card{background:var(--panel);border:1px solid var(--edge);padding:26px 22px;position:relative;transition:all .25s}
+  .card:hover{transform:translateY(-4px)}
+  .card .icon{font-size:2.6rem;display:block;margin-bottom:10px}
+  .card h3{letter-spacing:.12em;font-size:1.15rem;margin-bottom:2px}
+  .card .daw{font-size:1.35rem;margin-bottom:10px;font-weight:bold}
+  .card p{color:var(--ash);font-size:.92rem}
+  .card code{display:block;margin-top:12px;font-size:.78rem;color:var(--bone);background:#0d0a0d;
+    padding:6px 8px;border-left:3px solid var(--edge);font-family:Consolas,monospace;overflow-x:auto}
+  .war{border-top:3px solid var(--war)} .war:hover{box-shadow:0 8px 24px rgba(194,40,60,.25)}
+  .death{border-top:3px solid var(--death)} .death:hover{box-shadow:0 8px 24px rgba(154,165,177,.25)}
+  .pest{border-top:3px solid var(--pest)} .pest:hover{box-shadow:0 8px 24px rgba(123,182,97,.25)}
+  .famine{border-top:3px solid var(--famine)} .famine:hover{box-shadow:0 8px 24px rgba(212,160,23,.25)}
+  h2{margin:46px 0 14px;letter-spacing:.1em;color:var(--bone);border-bottom:1px solid var(--edge);padding-bottom:8px}
+  .rite{background:var(--panel);border:1px solid var(--edge);border-left:4px solid var(--blood);
+    padding:18px 20px;margin:14px 0;font-family:Consolas,monospace;font-size:.9rem;overflow-x:auto;white-space:pre}
+  .rite b{color:var(--gold)}
+  p.lore{color:var(--ash);margin:10px 0}
+  p.lore b{color:var(--bone)}
+  .credits{font-size:.9rem;color:var(--ash)}
+  .credits a{color:var(--bone)}
+  footer{text-align:center;padding:40px 20px;color:var(--ash);font-size:.85rem;border-top:1px solid var(--edge)}
+  .pulse{animation:pulse 3s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.85}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<header>
+  <div class="horses pulse">🐎 🐎 🐎 🐎</div>
+  <h1>THE <span class="red">DAW HORSEMEN</span> OF THE APOCALYPSE</h1>
+  <p class="tag">MCP Survival Pack — four DAWs, one repo, your AI rides them all.</p>
+  <div class="seals">
+    <a href="https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack">⛧ THE REPO</a>
+    <a href="https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack#install-any-machine">☠ INSTALL</a>
+    <a href="https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack/blob/main/CHANGELOG.md">📜 CHANGELOG</a>
+  </div>
+</header>
+<main>
+  <div class="grid">
+    <div class="card death">
+      <span class="icon">☠️</span>
+      <h3>DEATH</h3><div class="daw">REAPER</div>
+      <p>The pale rider. Tracks, items, MIDI, FX, envelopes, renders — the full harvest. Python server + Lua bridge.</p>
+      <code>packages/reaper-mcp/</code>
+    </div>
+    <div class="card war">
+      <span class="icon">⚔️</span>
+      <h3>WAR</h3><div class="daw">BITWIG</div>
+      <p>Takes peace from the earth — but shares one OSC link. Shared SSE server lets EVERY client ride at once.</p>
+      <code>packages/bitwig-mcp-server/</code>
+    </div>
+    <div class="card pest">
+      <span class="icon">🦠</span>
+      <h3>PESTILENCE</h3><div class="daw">RENOISE</div>
+      <p>Spreads through the tracker grid, pattern by pattern. Node bridge into ReMCP running inside Renoise.</p>
+      <code>packages/renoise-mcp-bridge/</code>
+    </div>
+    <div class="card famine">
+      <span class="icon">🌾</span>
+      <h3>FAMINE</h3><div class="daw">REASON</div>
+      <p>Has no MCP of its own — it starves. So it rides inside REAPER as a Rack Plugin, and Death carries two.</p>
+      <code>packages/reason/</code>
+    </div>
+  </div>
+
+  <h2>THE SUMMONING</h2>
+  <div class="rite"><b>git clone</b> https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
+<b>cd</b> DAW-Horsemen
+<b>INSTALL.bat</b>     :: deps + Bitwig extension + REAPER bridge + your config paths</div>
+
+  <h2>THE PROPHECY (UPDATES)</h2>
+  <div class="rite"><b>UPDATE.bat</b>      :: checks GitHub, pulls if behind, refreshes deps</div>
+  <p class="lore">The repo is the <b>source of truth</b>. Dev happens in the clone; when a version
+  is worthy, it is committed and <b>PUBLISH.bat</b>-ed. Every other machine just runs UPDATE.bat.
+  Loose copies are heresy.</p>
+
+  <h2>ONE WAR, MANY GENERALS</h2>
+  <p class="lore">Bitwig's OSC controller speaks to <b>one</b> process. The pack ships a shared
+  HTTP-SSE server — <b>run_bitwig_mcp_shared.bat</b> — so Claude CLI, Cursor and Claude Desktop
+  all command the same battlefield at <b>http://127.0.0.1:8080/sse</b> instead of fighting over UDP 9001.</p>
+
+  <h2>CREDITS</h2>
+  <p class="credits">Built on the shoulders of upstream riders:
+  REAPER MCP — <a href="https://github.com/TwelveTake">TwelveTake</a> lineage ·
+  Bitwig MCP — <a href="https://github.com/jxstanford/bitwig-mcp-server">jxstanford/bitwig-mcp-server</a> ·
+  OSC — <a href="http://www.mossgrabers.de/">DrivenByMoss, Jürgen Moßgraber</a> ·
+  Renoise-side — ReMCP. Pack tooling, shared server &amp; assembly — aday + Claude.
+  Respect each package's LICENSE.</p>
+</main>
+<footer>🐎 And I looked, and behold, four DAWs — and their MIDI followed with them. · aday1 · Beerware-adjacent, see per-package licenses</footer>
+</body>
+</html>

@@ -4,7 +4,7 @@
  *
  * Optional local reference UI:
  *   RENOISE_MCP_DASHBOARD=1
- *   RENOISE_MCP_DASHBOARD_PORT=3849 (default)
+ *   RENOISE_MCP_DASHBOARD_PORT=65535 (default)
  */
 import http from 'node:http';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -21,7 +21,7 @@ const BRIDGE_VERSION = '1.0.2';
 
 const INSTALL_STEPS = [
   'Install Renoise and the ReMCP / Renoise MCP extension or tool that exposes an HTTP MCP endpoint (see that project docs).',
-  'In Renoise, start the MCP server from the tool UI so something is listening (default often http://127.0.0.1:19714/mcp).',
+  'In Renoise, start the MCP server from the tool UI so something is listening (default often http://127.0.0.1:65535/mcp).',
   'On this machine: open a shell in the RenoiseMCP folder, run npm install.',
   'Register this bridge in Cursor MCP settings: command node, args: full path to bridge.js, cwd: this folder.',
   'If the URL is not the default, set env RENOISE_MCP_URL to your /mcp URL.',
@@ -44,7 +44,7 @@ const SAMPLE_PROMPTS = [
   [
     'Install checklist (human)',
     'Walk me through installing Renoise MCP end-to-end: Renoise + ReMCP server running, Node bridge deps, ' +
-      'and a Cursor mcp.json block using my real paths. Mention RENOISE_MCP_URL if my port is not 19714.',
+      'and a Cursor mcp.json block using my real paths. Mention RENOISE_MCP_URL if my port is not 65535.',
   ],
   [
     'EDM pattern sketch',
@@ -92,7 +92,7 @@ function referenceJson() {
     installation: {
       steps: INSTALL_STEPS,
       env: {
-        RENOISE_MCP_URL: 'Override default http://127.0.0.1:19714/mcp',
+        RENOISE_MCP_URL: 'Override default http://127.0.0.1:65535/mcp',
         RENOISE_BRIDGE_RETRIES: 'Connection retries (default 60)',
         RENOISE_BRIDGE_DELAY_MS: 'Delay between retries ms (default 500)',
         RENOISE_MCP_DASHBOARD: 'Set 1/true for http://127.0.0.1:3849/',
@@ -201,55 +201,107 @@ function targetUrl() {
   }
 }
 
-async function connectUpstream(url) {
-  const retries = Number(process.env.RENOISE_BRIDGE_RETRIES || 60);
-  const delayMs = Number(process.env.RENOISE_BRIDGE_DELAY_MS || 500);
-  let lastErr;
-  for (let i = 0; i < retries; i++) {
-    const client = new Client({ name: 'renoise-bridge', version: BRIDGE_VERSION });
-    if (process.env.RENOISE_BRIDGE_DEBUG === '1') {
-      client.onerror = (err) => log('upstream client error:', err);
-    }
-    try {
-      const t1 = new StreamableHTTPClientTransport(url);
-      await client.connect(t1);
-      log('connected (streamable HTTP) ->', url.href);
-      return { client, transport: t1 };
-    } catch (e1) {
-      lastErr = e1;
-      try {
-        const client2 = new Client({ name: 'renoise-bridge', version: BRIDGE_VERSION });
-        if (process.env.RENOISE_BRIDGE_DEBUG === '1') {
-          client2.onerror = (err) => log('upstream SSE client error:', err);
-        }
-        const t2 = new SSEClientTransport(url);
-        await client2.connect(t2);
-        log('connected (SSE fallback) ->', url.href);
-        return { client: client2, transport: t2 };
-      } catch (e2) {
-        lastErr = e2;
-      }
-    }
-    if (i === 0 || (i + 1) % 10 === 0) {
-      log(
-        `waiting for ReMCP (${i + 1}/${retries}):`,
-        lastErr?.message || lastErr,
-      );
-    }
-    await new Promise((r) => setTimeout(r, delayMs));
+const WAITING_TOOL = {
+  name: 'renoise_mcp_wait',
+  description:
+    'ReMCP is not connected yet. In Renoise: Tools -> Renoise MCP (opens the panel and auto-starts the server on port 19714). Then retry.',
+  inputSchema: { type: 'object', properties: {} },
+};
+
+function waitingResponse() {
+  return {
+    content: [
+      {
+        type: 'text',
+        text:
+          'ReMCP is not running. Open Renoise, then Tools -> Renoise MCP. ' +
+          'The panel auto-starts the HTTP server at http://127.0.0.1:19714/mcp. ' +
+          'This bridge will connect automatically once it is up.',
+      },
+    ],
+    isError: true,
+  };
+}
+
+async function tryConnectUpstream(url) {
+  const client = new Client({ name: 'renoise-bridge', version: BRIDGE_VERSION });
+  if (process.env.RENOISE_BRIDGE_DEBUG === '1') {
+    client.onerror = (err) => log('upstream client error:', err);
   }
-  log('giving up. Start Renoise + ReMCP (Tools -> Renoise MCP -> Start Server) first.');
-  log('last error:', lastErr?.message || lastErr);
-  process.exit(1);
+  try {
+    const t1 = new StreamableHTTPClientTransport(url);
+    await client.connect(t1);
+    log('connected (streamable HTTP) ->', url.href);
+    return { client, transport: t1 };
+  } catch (e1) {
+    try {
+      const client2 = new Client({ name: 'renoise-bridge', version: BRIDGE_VERSION });
+      if (process.env.RENOISE_BRIDGE_DEBUG === '1') {
+        client2.onerror = (err) => log('upstream SSE client error:', err);
+      }
+      const t2 = new SSEClientTransport(url);
+      await client2.connect(t2);
+      log('connected (SSE fallback) ->', url.href);
+      return { client: client2, transport: t2 };
+    } catch (e2) {
+      throw e2;
+    }
+  }
+}
+
+function startUpstreamPoller(url, onConnected) {
+  const retries = Number(process.env.RENOISE_BRIDGE_RETRIES || 0);
+  const delayMs = Number(process.env.RENOISE_BRIDGE_DELAY_MS || 500);
+  let attempt = 0;
+  let connecting = false;
+
+  const tick = async () => {
+    if (connecting) return;
+    connecting = true;
+    try {
+      const upstream = await tryConnectUpstream(url);
+      _cachedUpstreamUrl = url.href;
+      await refreshToolCache(upstream.client);
+      onConnected(upstream.client);
+      log('upstream ready');
+      return;
+    } catch (e) {
+      attempt += 1;
+      if (attempt === 1 || attempt % 10 === 0) {
+        const suffix =
+          retries > 0 ? ` (${attempt}/${retries})` : ` (${attempt}, retrying)`;
+        log(`waiting for ReMCP${suffix}:`, e?.message || e);
+      }
+      if (retries > 0 && attempt >= retries) {
+        log(
+          'giving up after',
+          retries,
+          'retries. Start Renoise + ReMCP (Tools -> Renoise MCP) first.',
+        );
+        log('last error:', e?.message || e);
+        process.exit(1);
+      }
+    } finally {
+      connecting = false;
+    }
+    setTimeout(tick, delayMs);
+  };
+
+  log(
+    'waiting for ReMCP at',
+    url.href,
+    '- open Renoise: Tools -> Renoise MCP (auto-starts server)',
+  );
+  tick();
 }
 
 async function main() {
   const url = targetUrl();
   log('target', url.href);
-  const { client: upstream } = await connectUpstream(url);
   _cachedUpstreamUrl = url.href;
-  await refreshToolCache(upstream);
   startDashboard();
+
+  let upstream = null;
 
   const server = new Server(
     { name: 'renoise-mcp-bridge', version: BRIDGE_VERSION },
@@ -257,15 +309,25 @@ async function main() {
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async (request) => {
+    if (!upstream) {
+      return { tools: [WAITING_TOOL] };
+    }
     return upstream.listTools(request.params ?? {});
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (!upstream) {
+      return waitingResponse();
+    }
     return upstream.callTool(request.params);
   });
 
   const stdio = new StdioServerTransport();
   await server.connect(stdio);
+
+  startUpstreamPoller(url, (client) => {
+    upstream = client;
+  });
 }
 
 main().catch((e) => {

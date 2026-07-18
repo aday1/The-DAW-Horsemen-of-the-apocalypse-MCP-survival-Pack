@@ -1,0 +1,72 @@
+BITWIG MCP - setup (most of it is already done for you)
+=======================================================
+This connects Bitwig Studio to an MCP server (from your DAW Horsemen pack,
+jxstanford/bitwig-mcp-server lineage) so an MCP client (Cursor, etc.) can drive
+Bitwig over OSC via the DrivenByMoss "Open Sound Control" controller.
+
+WHAT I ALREADY DID
+  * Staged the server here:      E:\ChiptuneClaude\bitwig-mcp\server\   (python -m bitwig_mcp_server)
+  * Copied the extension into:   %USERPROFILE%\Documents\Bitwig Studio\Extensions\drivebymossvaday.bwextension
+  * Installed the Python deps into your Python 3.11 (mcp[cli], python-osc,
+    pydantic, pydantic-settings) - verified IMPORT_OK.
+  * Added a "bitwig" entry to    E:\ChiptuneClaude\.mcp.json  (ports 8005/9001).
+  * Smoke-tested the server package - it imports and loads settings cleanly.
+
+PORTS (already matched everywhere)
+  MCP -> Bitwig  (Bitwig RECEIVE):  8005
+  Bitwig -> MCP  (Bitwig SEND):     9001
+  Host: 127.0.0.1
+
+STEP 1 - enable the OSC controller inside Bitwig  (one time)
+  a) Restart Bitwig Studio (so it detects the new extension).
+  b) Dashboard -> Settings -> Controllers.
+  c) Click "Add Controller".
+  d) Vendor: DrivenByMoss (Jürgen Moßgraber). Product: "Open Sound Control".
+     (If you prefer, Bitwig's own generic "Open Sound Control" also works with
+      this server's address space; DrivenByMoss is the tested one.)
+  e) In its panel set:  Receive Port = 8005,  Send Port = 9001,  Send Host = 127.0.0.1.
+     Leave it enabled. Bitwig now listens/sends OSC on those ports.
+
+STEP 2 - run the MCP server
+  Double-click  E:\ChiptuneClaude\bitwig-mcp\run_bitwig_mcp.bat
+  (or:  cd E:\ChiptuneClaude\bitwig-mcp\server  &&  py -m bitwig_mcp_server )
+  Leave it running while you work. It talks to Bitwig on 8005/9001.
+
+STEP 3 - register it in your MCP client (Cursor / Cowork)
+  The server is already defined in E:\ChiptuneClaude\.mcp.json as "bitwig":
+      command: <your Python 3.11>\python.exe
+      args:    -m bitwig_mcp_server
+      cwd:     E:\ChiptuneClaude\bitwig-mcp\server
+      env:     BITWIG_MCP_BITWIG_HOST=127.0.0.1  BITWIG_MCP_BITWIG_SEND_PORT=8005  BITWIG_MCP_BITWIG_RECEIVE_PORT=9001
+  Point Cursor's MCP settings at this server (or copy that block into Cursor's
+  mcp config), then restart Cursor. If your client auto-loads project .mcp.json
+  for E:\ChiptuneClaude, just restart it.
+
+VERIFY
+  With Bitwig open (STEP 1 done) and the server running (STEP 2), your MCP client
+  should list bitwig tools (transport, tracks, devices, browser, etc.). Try a
+  transport/play or "get project" style tool to confirm two-way OSC.
+
+OPTIONAL (semantic device/browser search)
+  The browser-index / device-recommend extras need heavier deps:
+      py -m pip install --user chromadb sentence-transformers beautifulsoup4 requests
+  Then use the bitwig-browser-index / bitwig-device-recommend console scripts.
+  Not required for normal control.
+
+TROUBLESHOOTING
+  * No tools / no response: confirm the OSC controller is added AND enabled in
+    Bitwig, and that ports match (8005 receive / 9001 send).
+  * "module not found": run install_deps.bat again, or run the server with the
+    Python that has the deps (the .bat uses `py` then falls back to `python`).
+  * Firewall: allow local UDP 8005/9001 for Bitwig and Python if prompted.
+  * Port clash: 8000 = Renoise OSC, 9000 = Reaper HTTP (optional). Bitwig uses 8005/9001.
+
+Files here:
+  server\                          the MCP server package
+  drivebymossvaday.bwextension     the Bitwig controller extension (also copied to Bitwig)
+  install_deps.bat                 installs core Python deps (already run)
+  install_extension.bat            copies the extension into Bitwig (already run)
+  run_bitwig_mcp.bat               launches the MCP server
+  install_log.txt / ext_log.txt    logs from the two installers
+
+Upstream: jxstanford/bitwig-mcp-server ; DrivenByMoss by Jürgen Moßgraber.

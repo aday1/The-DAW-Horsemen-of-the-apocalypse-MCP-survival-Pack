@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 # Default OSC settings
 DEFAULT_BITWIG_IP = "127.0.0.1"
-DEFAULT_RECEIVE_PORT = 9000  # Port we listen on
+DEFAULT_RECEIVE_PORT = 9001  # Port we listen on
 
 
 class BitwigOSCServer:

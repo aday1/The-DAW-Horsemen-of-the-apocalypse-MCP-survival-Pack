@@ -272,8 +272,8 @@ def reference_payload() -> dict[str, Any]:
         ],
         "install_summary": render_install_guide("full")[:1200] + "\n\n[truncated; call get_bitwig_mcp_install_guide]",
         "osc_defaults": {
-            "send_to_bitwig": "127.0.0.1:8000 (BITWIG_MCP_BITWIG_SEND_PORT)",
-            "listen_from_bitwig": "127.0.0.1:9000 (BITWIG_MCP_BITWIG_RECEIVE_PORT)",
+            "send_to_bitwig": "127.0.0.1:8005 (BITWIG_MCP_BITWIG_SEND_PORT)",
+            "listen_from_bitwig": "127.0.0.1:9001 (BITWIG_MCP_BITWIG_RECEIVE_PORT)",
         },
         "fx_automation_note": (
             "Device parameter moves use OSC /device/param/N/value. For recorded automation, use automation_touch=true "
@@ -380,8 +380,8 @@ def build_dashboard_html() -> str:
 
     <h2>OSC ports (defaults)</h2>
     <ul class="bullets">
-      <li>UDP to Bitwig: 127.0.0.1:8000 (<code>BITWIG_MCP_BITWIG_SEND_PORT</code>)</li>
-      <li>UDP from Bitwig: 127.0.0.1:9000 (<code>BITWIG_MCP_BITWIG_RECEIVE_PORT</code>)</li>
+      <li>UDP to Bitwig: 127.0.0.1:8005 (<code>BITWIG_MCP_BITWIG_SEND_PORT</code>)</li>
+      <li>UDP from Bitwig: 127.0.0.1:9001 (<code>BITWIG_MCP_BITWIG_RECEIVE_PORT</code>)</li>
       <li>Add the DrivenByMoss / VAday Open Sound Control controller in Bitwig; receive port must match MCP.</li>
     </ul>
 

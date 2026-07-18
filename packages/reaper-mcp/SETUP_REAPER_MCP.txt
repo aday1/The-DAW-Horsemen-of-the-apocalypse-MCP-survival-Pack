@@ -1,0 +1,48 @@
+REAPER MCP — finish setup (3 steps, ~3 minutes)
+================================================
+Everything is already placed here on your machine:
+  E:\ChiptuneClaude\reaper-mcp\
+      reaper_mcp_bridge.lua   <- runs INSIDE REAPER (file-based, no ports)
+      reaper_mcp_server.py    <- the MCP server Cowork will launch
+      requirements.txt, test_connection.py, README.md
+A ready .mcp.json is at E:\ChiptuneClaude\.mcp.json
+
+STEP 1 — install the two Python deps (once)
+  Open Command Prompt and run:
+      pip install mcp httpx
+  (Uses your Python 3.11. If `pip` isn't found, use:  py -m pip install mcp httpx)
+
+STEP 2 — start the bridge inside REAPER (each REAPER session)
+  With ProtoCulture open in REAPER:
+    Actions -> Show action list -> "Load ReaScript..."
+    Browse to:  E:\ChiptuneClaude\reaper-mcp\reaper_mcp_bridge.lua
+    Select it and click Run/Open.
+  You should see "REAPER MCP Bridge started" in REAPER's console (View -> Show console).
+  Tip: after loading once, it appears in the action list so you can re-run it fast.
+
+STEP 3 — register the server in Cowork, then restart
+  The file E:\ChiptuneClaude\.mcp.json already defines the "reaper" server.
+  If Cowork picks up project .mcp.json for the folder you have open, just RESTART Cowork.
+  Otherwise add it manually in Cowork's connector / MCP settings as:
+      name:    reaper
+      command: python
+      args:    E:\ChiptuneClaude\reaper-mcp\reaper_mcp_server.py
+  Then fully quit and reopen Cowork so it launches the server.
+
+VERIFY (optional)
+  From Command Prompt:  python E:\ChiptuneClaude\reaper-mcp\test_connection.py
+  (REAPER must be running with the bridge loaded from STEP 2.)
+
+Once done, tell me "reaper mcp is live" and I'll drive REAPER directly:
+  - load Serum on the LEAD / STAB / SOLO MIDI tracks (LD-Brutal, Whomever, a lead)
+  - mute the matched-synth audio tracks
+  - set up real sidechain (setup_sidechain_compression: kick -> lead/stab)
+  - add a ReaVerbate reverb bus with sends
+  - render, then I measure the render and iterate — the fast loop you wanted.
+
+Notes
+  - Communication is file-based (writes JSON in %APPDATA%\REAPER\Scripts\mcp_bridge_data),
+    so no firewall/port setup is needed.
+  - The .lua can live anywhere; you just browse to it in Load ReaScript.
+  - Source: github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack
+    (TwelveTake reaper-mcp, MIT).
