@@ -56,8 +56,13 @@ function HashMatch($packPath, $instPath, $label) {
 }
 HashMatch (Join-Path $Pack 'packages\reaper-mcp\reaper_mcp_bridge.lua') `
   (Join-Path $env:APPDATA 'REAPER\Scripts\reaper_mcp_bridge.lua') 'REAPER lua'
-HashMatch (Join-Path $Pack 'drivebymossvaday.bwextension') `
-  (Join-Path $env:USERPROFILE 'Documents\Bitwig Studio\Extensions\drivebymossvaday.bwextension') 'Bitwig extension'
+$extPack = Join-Path $Pack 'DawpocalypseMCP.bwextension'
+if (-not (Test-Path -LiteralPath $extPack)) { $extPack = Join-Path $Pack 'drivebymossvaday.bwextension' }
+$extInst = Join-Path $env:USERPROFILE 'Documents\Bitwig Studio\Extensions\DawpocalypseMCP.bwextension'
+if (-not (Test-Path -LiteralPath $extInst)) {
+  $extInst = Join-Path $env:USERPROFILE 'Documents\Bitwig Studio\Extensions\drivebymossvaday.bwextension'
+}
+HashMatch $extPack $extInst 'Bitwig extension'
 $remcp = Join-Path $env:APPDATA 'Renoise\V3.5.4\Scripts\Tools\com.renoise.ReMCP.xrnx'
 if (Test-Path -LiteralPath $remcp) { Ok "Renoise ReMCP present ($remcp)" } else { Bad "Renoise ReMCP missing - install pack xrnx" }
 
