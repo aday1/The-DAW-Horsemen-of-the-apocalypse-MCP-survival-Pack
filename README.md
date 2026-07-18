@@ -1,8 +1,21 @@
-# 🐎 The DAW Horsemen of the Apocalypse — MCP Survival Pack
+# The DAW Horsemen of the Apocalypse — MCP Survival Pack
 
 Four DAWs. One repo. Your AI rides them all.
 
-MCP servers + bridges so Claude / Cursor / any MCP client can drive your studio:
+**Out of the box (any machine):**
+
+```bat
+git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
+cd DAW-Horsemen
+CARE.bat
+```
+
+`CARE.bat` is the whole setup: pull if behind, heal Bitwig/REAPER/Renoise +
+Mackie template, rewrite **Cursor / Claude Code / Claude CLI / Claude Desktop**
+MCP configs to this clone, Desktop shortcut, start shared Bitwig SSE `:8080`,
+health check. Restart IDEs once. Open DAWs. Ride.
+
+MCP servers + bridges:
 
 | Horseman | DAW | Path | Rides on |
 |---|---|---|---|
@@ -14,22 +27,11 @@ MCP servers + bridges so Claude / Cursor / any MCP client can drive your studio:
 
 **This repo is the source of truth.** Machines install from it and update from it.
 
-## Install (any machine)
+Version: see `VERSION`. Showcase: `docs/index.html`. IDE detail: `IDE_SETUP.txt`.
 
-```bat
-git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
-cd DAW-Horsemen
-CARE.bat
-```
+## Install notes
 
-`CARE.bat` is the GitHub care package: pulls if behind, **heals** Bitwig
-OSC ports + **DawpocalypseMCP** extension, REAPER lua, Mackie/X-Touch
-template, rewrites per-machine MCP JSON, Desktop shortcut, health check.
-
-`INSTALL.bat` still works for a first-time deps-only path; CARE is preferred.
-
-**Wire your IDE next:** read **`IDE_SETUP.txt`** (Cursor, Claude Code, Claude
-CLI, VS Code, Claude Desktop/Cowork). Template: `mcp.json.example`.
+`INSTALL.bat` = deps + heal (no SSE auto-start). **CARE is preferred.**
 
 ## Update (any machine)
 
@@ -37,7 +39,7 @@ CLI, VS Code, Claude Desktop/Cowork). Template: `mcp.json.example`.
 UPDATE.bat
 ```
 
-Checks GitHub, pulls if behind, refreshes deps. That's the whole updater.
+Checks GitHub, pulls if behind, refreshes deps. Or just run `CARE.bat` again.
 
 ## Launchers (DAWs + MCPs)
 
@@ -48,7 +50,7 @@ launch_daw_mcp.bat
 ```
 
 Menu can start Bitwig / REAPER / Renoise **and** their MCP side, run a health
-check (`scripts\health_check.ps1`), INSTALL, or UPDATE. Recreate the shortcut
+check (`scripts\health_check.ps1`), INSTALL, UPDATE, or CARE. Recreate the shortcut
 anytime: `powershell -File scripts\make_desktop_shortcut.ps1`
 
 ## Bitwig: ONE shared server, many clients
@@ -67,11 +69,13 @@ extensions) uses: `http://127.0.0.1:8080/sse` — full story in
 **Yes — shared Bitwig MCP works across all agents on the machine** as long as
 each client points at that SSE URL (not `python -m bitwig_mcp_server` stdio).
 REAPER / Renoise stay stdio-per-client (no single OSC port to fight over).
+
 ## Dev flow
 
 Dev happens in the clone (on the dev box: `E:\ChiptuneClaude\DAW-Horsemen`).
-Edit → test → when it's a keeper, commit and `PUBLISH.bat`. Other machines
-`UPDATE.bat`. No loose copies — if it's not in the repo, it doesn't exist.
+Edit → test → when it's a keeper, commit and `PUBLISH.bat` / `RELEASE.bat`.
+Other machines `CARE.bat` or `UPDATE.bat`. No loose copies — if it's not in the
+repo, it doesn't exist.
 
 ## Per-DAW quickstarts
 

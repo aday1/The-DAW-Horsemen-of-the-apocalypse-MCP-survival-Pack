@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.4.0 — "Out Of The Box" (2026-07-18)
+- **CARE.bat = one-shot OOTB**: heal agents + DAWs, Desktop shortcut, start
+  shared Bitwig SSE if down, health check. No manual MCP paste required.
+- **Heal upgrades**: upsert Cursor / Claude Code `.mcp.json` + `.cursor/mcp.json`
+  (jam + pack), enable Claude Code/CLI `enabledMcpjsonServers`, patch all
+  Claude Desktop config locations with `mcp-remote` → `:8080/sse`.
+- **Docs + showcase**: named upstream credits (TwelveTake, jxstanford,
+  Jürgen Moßgraber / DrivenByMoss, kraken ReMCP); remixed `docs/index.html`
+  with tracker / clip-launcher / envelope / rack primers.
+- **RELEASE.bat**: maintainer ZIP + GitHub release from `git archive`.
+
 ## 2.3.0 — "CARE + X-Touch" (2026-07-18)
 - **`CARE.bat`**: GitHub care package — pull if behind, always heal
   (OSC ports, DawpocalypseMCP, REAPER lua, MCP paths), Mackie template,

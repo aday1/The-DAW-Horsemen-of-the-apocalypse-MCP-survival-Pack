@@ -251,87 +251,180 @@ def tip_renoise(pack: Path) -> None:
 
 
 def write_mcp_generated(pack: Path) -> Path:
-    py = shutil.which("py") or shutil.which("python") or "python"
-    doc = {
-        "mcpServers": {
-            "bitwig": {"url": "http://127.0.0.1:8080/sse"},
-            "reaper": {
-                "command": py,
-                "args": [str(pack / "packages" / "reaper-mcp" / "reaper_mcp_server.py")],
-            },
-            "renoise": {
-                "command": "node",
-                "args": [
-                    str(pack / "packages" / "renoise-mcp-bridge" / "bridge.js")
-                ],
-                "cwd": str(pack / "packages" / "renoise-mcp-bridge"),
-                "env": {"RENOISE_MCP_URL": "http://127.0.0.1:19714/mcp"},
-            },
-        }
-    }
-    # Claude Desktop (stdio-only UI) prefers mcp-remote shim for Bitwig
-    desktop_bitwig = {
-        "command": str(Path(r"C:\Program Files\nodejs\npx.cmd")),
-        "args": ["-y", "mcp-remote", "http://127.0.0.1:8080/sse"],
-    }
+    doc = {"mcpServers": horsemen_servers(pack, desktop=False)}
     out = pack / "mcp.generated.json"
-    out.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    out.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
     desk = pack / "mcp.claude_desktop.snippet.json"
     desk.write_text(
-        json.dumps({"mcpServers": {"bitwig": desktop_bitwig, **{k: v for k, v in doc["mcpServers"].items() if k != "bitwig"}}}, indent=2),
+        json.dumps({"mcpServers": horsemen_servers(pack, desktop=True)}, indent=2)
+        + "\n",
         encoding="utf-8",
     )
     print(f"  wrote {out.name} + {desk.name}")
     return out
 
 
-def patch_json_mcp(path: Path, pack: Path) -> bool:
-    if not path.is_file():
-        return False
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except Exception as e:
-        print(f"  WARN: skip {path}: {e}")
-        return False
-    servers = data.get("mcpServers")
-    if not isinstance(servers, dict):
-        return False
-    changed = False
-    # bitwig -> shared SSE url (Cursor / Claude Code). Desktop uses separate snippet.
-    if "bitwig" in servers:
-        want = {"url": "http://127.0.0.1:8080/sse"}
-        if servers["bitwig"] != want and "mcp-remote" not in json.dumps(servers["bitwig"]):
-            # keep mcp-remote if already present (Desktop)
-            if not (
-                isinstance(servers["bitwig"], dict)
-                and "mcp-remote" in json.dumps(servers["bitwig"])
-            ):
-                servers["bitwig"] = want
-                changed = True
+def _python_cmd() -> str:
+    for cand in (
+        Path(r"C:\Users\aday\AppData\Local\Programs\Python\Python311\python.exe"),
+        Path(shutil.which("python") or ""),
+        Path(shutil.which("py") or ""),
+    ):
+        if cand and cand.is_file():
+            return str(cand)
+    return shutil.which("python") or shutil.which("py") or "python"
+
+
+def horsemen_servers(pack: Path, *, desktop: bool = False) -> dict:
+    """Canonical MCP server blocks for this pack (absolute paths)."""
+    py = _python_cmd()
     reaper_py = str(pack / "packages" / "reaper-mcp" / "reaper_mcp_server.py")
-    if "reaper" in servers and isinstance(servers["reaper"], dict):
-        args = servers["reaper"].get("args") or []
-        if args and "DAW-Horsemen" not in str(args[0]):
-            servers["reaper"]["args"] = [reaper_py]
-            changed = True
-        elif not args:
-            servers["reaper"]["args"] = [reaper_py]
-            changed = True
     renoise_js = str(pack / "packages" / "renoise-mcp-bridge" / "bridge.js")
     renoise_cwd = str(pack / "packages" / "renoise-mcp-bridge")
-    if "renoise" in servers and isinstance(servers["renoise"], dict):
-        r = servers["renoise"]
-        if r.get("cwd") != renoise_cwd or (
-            r.get("args") and "DAW-Horsemen" not in str(r["args"][0])
+    npx = Path(r"C:\Program Files\nodejs\npx.cmd")
+    if desktop:
+        bitwig = {
+            "command": str(npx) if npx.is_file() else "npx",
+            "args": ["-y", "mcp-remote", "http://127.0.0.1:8080/sse"],
+        }
+    else:
+        bitwig = {"url": "http://127.0.0.1:8080/sse"}
+    return {
+        "bitwig": bitwig,
+        "reaper": {"command": py, "args": [reaper_py]},
+        "renoise": {
+            "command": "node",
+            "args": [renoise_js],
+            "cwd": renoise_cwd,
+            "env": {"RENOISE_MCP_URL": "http://127.0.0.1:19714/mcp"},
+        },
+    }
+
+
+def patch_json_mcp(path: Path, pack: Path, *, create: bool = False) -> bool:
+    """Upsert bitwig/reaper/renoise into an MCP JSON file; keep other servers."""
+    if not path.is_file():
+        if not create:
+            return False
+        path.parent.mkdir(parents=True, exist_ok=True)
+        data = {"mcpServers": {}}
+    else:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"  WARN: skip {path}: {e}")
+            return False
+    servers = data.setdefault("mcpServers", {})
+    if not isinstance(servers, dict):
+        return False
+    want = horsemen_servers(pack, desktop=False)
+    changed = False
+    for name, block in want.items():
+        cur = servers.get(name)
+        # Keep Desktop mcp-remote bitwig if somehow in a project file
+        if (
+            name == "bitwig"
+            and isinstance(cur, dict)
+            and "mcp-remote" in json.dumps(cur)
         ):
-            r["args"] = [renoise_js]
-            r["cwd"] = renoise_cwd
-            r.setdefault("env", {})["RENOISE_MCP_URL"] = "http://127.0.0.1:19714/mcp"
+            continue
+        if cur != block:
+            servers[name] = block
             changed = True
-    if changed:
+    if changed or create:
         path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
         print(f"  patched agent config: {path}")
     return changed
+
+
+def ensure_claude_code_enabled(project_roots: list[Path]) -> None:
+    """Enable bitwig/reaper/renoise in ~/.claude.json for known project roots."""
+    cfg = Path.home() / ".claude.json"
+    if not cfg.is_file():
+        print("  ..  no ~/.claude.json (Claude Code/CLI not initialized yet)")
+        return
+    try:
+        data = json.loads(cfg.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"  WARN: ~/.claude.json unreadable: {e}")
+        return
+    projects = data.setdefault("projects", {})
+    if not isinstance(projects, dict):
+        return
+    need = ["bitwig", "reaper", "renoise"]
+    changed = False
+    # Normalize keys Claude uses (forward slashes)
+    variants = []
+    for root in project_roots:
+        r = str(root.resolve())
+        variants.extend({r, r.replace("\\", "/"), r.replace("/", "\\")})
+    for key, proj in list(projects.items()):
+        if not isinstance(proj, dict):
+            continue
+        key_norm = key.replace("\\", "/").rstrip("/").lower()
+        hit = any(
+            v.replace("\\", "/").rstrip("/").lower() == key_norm
+            or key_norm.endswith("/" + Path(v).name.lower())
+            for v in variants
+        )
+        # Also match if project path contains ChiptuneClaude or DAW-Horsemen
+        if not hit:
+            if "chiptuneclaude" not in key_norm and "daw-horsemen" not in key_norm:
+                continue
+        enabled = proj.get("enabledMcpjsonServers")
+        if not isinstance(enabled, list):
+            enabled = []
+        new = list(enabled)
+        for n in need:
+            if n not in new:
+                new.append(n)
+                changed = True
+        if new != enabled:
+            proj["enabledMcpjsonServers"] = new
+            changed = True
+            print(f"  Claude Code/CLI enabled MCP for: {key} -> {new}")
+    if changed:
+        cfg.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    else:
+        print("  Claude Code/CLI MCP enable list already OK (or no matching project)")
+
+
+def find_claude_desktop_configs() -> list[Path]:
+    found: list[Path] = []
+    local = Path(os.environ.get("LOCALAPPDATA", ""))
+    roaming = Path(os.environ.get("APPDATA", ""))
+    candidates = [
+        roaming / "Claude" / "claude_desktop_config.json",
+        local / "Claude" / "claude_desktop_config.json",
+    ]
+    pkg = local / "Packages"
+    if pkg.is_dir():
+        for d in pkg.glob("Claude_*"):
+            candidates.append(
+                d / "LocalCache" / "Roaming" / "Claude" / "claude_desktop_config.json"
+            )
+    for c in candidates:
+        if c.is_file() and c not in found:
+            found.append(c)
+    return found
+
+
+def patch_claude_desktop(pack: Path) -> None:
+    servers_want = horsemen_servers(pack, desktop=True)
+    desks = find_claude_desktop_configs()
+    if not desks:
+        print("  ..  Claude Desktop config not found (OK if Desktop unused)")
+        return
+    for desk in desks:
+        try:
+            data = json.loads(desk.read_text(encoding="utf-8"))
+            servers = data.setdefault("mcpServers", {})
+            for name, block in servers_want.items():
+                servers[name] = block
+            desk.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+            print(f"  patched Claude Desktop: {desk}")
+        except Exception as e:
+            print(f"  WARN: Claude Desktop patch failed ({desk}): {e}")
 
 
 def main() -> int:
@@ -374,60 +467,29 @@ def main() -> int:
     print("[5] mcp.generated.json")
     write_mcp_generated(pack)
 
-    print("[6] agent MCP path heal (project configs)")
+    print("[6] agent MCP path heal (Cursor / Claude Code / pack)")
     jam = pack.parent
-    for rel in (".mcp.json", ".cursor/mcp.json"):
-        patch_json_mcp(jam / rel, pack)
-    # Claude Desktop Store path
-    local = Path(os.environ.get("LOCALAPPDATA", ""))
-    desk = (
-        local
-        / "Packages"
-        / "Claude_pzs8sxrjxfjjc"
-        / "LocalCache"
-        / "Roaming"
-        / "Claude"
-        / "claude_desktop_config.json"
-    )
-    if desk.is_file():
-        try:
-            data = json.loads(desk.read_text(encoding="utf-8"))
-            servers = data.setdefault("mcpServers", {})
-            py = r"C:\Users\aday\AppData\Local\Programs\Python\Python311\python.exe"
-            if not Path(py).is_file():
-                py = shutil.which("python") or shutil.which("py") or "python"
-            npx = Path(r"C:\Program Files\nodejs\npx.cmd")
-            servers["bitwig"] = {
-                "command": str(npx) if npx.is_file() else "npx",
-                "args": ["-y", "mcp-remote", "http://127.0.0.1:8080/sse"],
-            }
-            servers["reaper"] = {
-                "command": py,
-                "args": [
-                    str(pack / "packages" / "reaper-mcp" / "reaper_mcp_server.py")
-                ],
-            }
-            servers["renoise"] = {
-                "command": "node",
-                "args": [
-                    str(pack / "packages" / "renoise-mcp-bridge" / "bridge.js")
-                ],
-                "cwd": str(pack / "packages" / "renoise-mcp-bridge"),
-                "env": {"RENOISE_MCP_URL": "http://127.0.0.1:19714/mcp"},
-            }
-            desk.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-            print(f"  patched Claude Desktop: {desk}")
-        except Exception as e:
-            print(f"  WARN: Claude Desktop patch failed: {e}")
+    patch_json_mcp(jam / ".mcp.json", pack, create=True)
+    patch_json_mcp(jam / ".cursor" / "mcp.json", pack, create=True)
+    patch_json_mcp(pack / ".mcp.json", pack, create=True)
+    patch_json_mcp(pack / ".cursor" / "mcp.json", pack, create=True)
+    patch_json_mcp(jam / ".vscode" / "mcp.json", pack, create=False)
+
+    print("[7] Claude Code / Claude CLI enable list")
+    ensure_claude_code_enabled([jam, pack])
+
+    print("[8] Claude Desktop")
+    patch_claude_desktop(pack)
 
     print()
-    print("DONE. Next:")
-    print("  1. Quit Bitwig fully, reopen (loads DawpocalypseMCP + fixed ports)")
+    print("DONE. Out of the box next:")
+    print("  1. Quit Bitwig fully once, reopen (loads DawpocalypseMCP + ports)")
     print("  2. Controllers: enable DawpocalypseMCP / Open Sound Control")
     print("     Receive 8005 / Send 9001 / host 127.0.0.1")
-    print("  3. Launchers menu 1 = shared SSE :8080")
-    print("  4. Paste mcp.generated.json into Cursor/Claude Code;")
-    print("     Claude Desktop use mcp.claude_desktop.snippet.json")
+    print("  3. Desktop 'DAW MCP Launchers' menu 1 = shared SSE :8080")
+    print("     (CARE.bat starts SSE if it was down)")
+    print("  4. Restart Cursor / Claude Desktop / Claude Code session once")
+    print("  Agents already pointed at Horsemen paths + shared Bitwig SSE.")
     return 0
 
 

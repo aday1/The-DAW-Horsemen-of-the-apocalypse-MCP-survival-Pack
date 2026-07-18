@@ -1,19 +1,23 @@
 THE DAW HORSEMEN MCP PACK -- SETUP
 ==================================
 GitHub: aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack
+Version: see VERSION (stamp on each release)
 
-Fresh machine
--------------
+Out of the box (any machine)
+----------------------------
   git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
   cd DAW-Horsemen
   CARE.bat
 
-CARE.bat = update-if-behind + heal + Mackie template + shortcut + health.
-INSTALL.bat = deps + heal (still fine). UPDATE.bat = git pull + heal.
+CARE.bat = update-if-behind + heal agents+DAWs + Mackie + shortcut +
+           start shared Bitwig SSE + health.
+  Heals Cursor / Claude Code / Claude CLI / Claude Desktop MCP configs,
+  Bitwig DawpocalypseMCP + OSC 8005/9001, REAPER lua, Renoise ReMCP.
 
-Release ZIP (maintainers):  RELEASE.bat  -> dist\ + GitHub release
+Then: restart IDEs once. Open DAWs. IDE_SETUP.txt only if something drifts.
 
-Then read:  IDE_SETUP.txt   (Cursor, Claude Code, Claude CLI, VS Code, Desktop)
+INSTALL.bat = deps + heal. UPDATE.bat = git pull + heal.
+RELEASE.bat = maintainer ZIP + GitHub release.
 
 
 Day-to-day
