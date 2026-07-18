@@ -186,6 +186,55 @@ def sync_reaper(pack: Path) -> None:
     print(f"  REAPER lua -> {dest}")
 
 
+def disable_reaper_mcu_for_bitwig() -> None:
+    """Bitwig+DrivenByMoss is Horsemen's default X-Touch home.
+
+    Windows MIDI is exclusive — REAPER Mackie and Bitwig MCU cannot share
+    the same X-Touch ports. Clear REAPER MCU/HUI csurf lines so Bitwig wins.
+    """
+    ini = Path(os.environ.get("APPDATA", "")) / "REAPER" / "reaper.ini"
+    if not ini.is_file():
+        print("  ..  no reaper.ini (skip MCU disable)")
+        return
+    bak = ini.with_name("reaper.ini.bak_horsemen_xtouch")
+    if not bak.is_file():
+        shutil.copy2(ini, bak)
+    lines = ini.read_text(encoding="utf-8", errors="replace").splitlines(True)
+    out: list[str] = []
+    removed: list[str] = []
+    for line in lines:
+        if line.startswith("csurf_cnt="):
+            nl = "\n" if line.endswith("\n") else ""
+            out.append(f"csurf_cnt=0{nl}")
+            if line.strip() != "csurf_cnt=0":
+                removed.append(line.strip())
+            continue
+        if line.startswith("csurf_") and not line.startswith("csurf_cnt"):
+            body = line.split("=", 1)[-1].strip().upper()
+            if body.startswith(("MCU", "HUI")) or "MACKIE" in body or "XTOUCH" in body.replace("-", ""):
+                removed.append(line.strip())
+                continue
+        out.append(line)
+    ini.write_text("".join(out), encoding="utf-8")
+    if removed:
+        side = ini.parent / "horsemen_xtouch_owner.txt"
+        side.write_text(
+            "owner=bitwig\n"
+            "reason=Horsemen default: DrivenByMoss MCU best supported on Bitwig\n"
+            "disabled_reaper_csurf:\n"
+            + "\n".join(removed)
+            + "\nbackup="
+            + str(bak)
+            + "\n",
+            encoding="utf-8",
+        )
+        print("  REAPER Mackie/MCU disabled (X-Touch -> Bitwig)")
+        print(f"  backup: {bak.name}")
+        print("  If REAPER was open: restart it so MIDI ports release.")
+    else:
+        print("  REAPER has no Mackie/MCU surface (X-Touch free for Bitwig)")
+
+
 def install_mackie_xtouch(pack: Path) -> None:
     """Install Behringer X-Touch Bitwig template from pack (MCU is in DawpocalypseMCP)."""
     src = pack / "packages" / "mackie-xtouch" / "bitwig-template"
@@ -461,7 +510,8 @@ def main() -> int:
     print("[4] Renoise ReMCP")
     tip_renoise(pack)
 
-    print("[4b] Mackie / Behringer X-Touch (Bitwig template + MCU note)")
+    print("[4b] Mackie / Behringer X-Touch (Bitwig = default owner)")
+    disable_reaper_mcu_for_bitwig()
     install_mackie_xtouch(pack)
 
     print("[5] mcp.generated.json")

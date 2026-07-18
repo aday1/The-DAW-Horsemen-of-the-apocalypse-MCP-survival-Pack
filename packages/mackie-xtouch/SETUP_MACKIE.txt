@@ -1,95 +1,62 @@
 MACKIE / BEHRINGER X-TOUCH (with DAW Horsemen MCP)
 ==================================================
-The X-Touch is NOT a separate MCP server. It talks MCU/MIDI to the DAW.
-MCP (Cursor/Claude) talks OSC/HTTP to the same DAW. They share the desk.
+DEFAULT OWNER: BITWIG (DrivenByMoss MCU — best supported in this pack)
 
-  X-Touch  --MCU MIDI-->  ONE DAW at a time (Bitwig OR REAPER)
-  Agents   --MCP------->  all DAWs (OSC/HTTP -- no MIDI fight)
+The X-Touch is NOT a separate MCP server. It talks MCU/MIDI to ONE DAW.
+MCP (Cursor/Claude) talks OSC/HTTP to every DAW. No MIDI fight there.
 
-DawpocalypseMCP.bwextension (DrivenByMoss fork) already includes:
-  - MCU - Control Universal  (+ extenders)
+  X-Touch  --MCU MIDI-->  Bitwig (MCU - Control Universal)   <-- default
+  Agents   --MCP------->  Bitwig + REAPER + Renoise
+
+DawpocalypseMCP.bwextension (DrivenByMoss fork) includes:
+  - MCU - Control Universal  (+ extenders)   <-- use this for full X-Touch
   - X-Touch One
   - HUI variants
-  - DawpocalypseMCP OSC (for agents)
+  - DawpocalypseMCP OSC (for agents)         <-- keep ON always
 
 
 CRITICAL -- WINDOWS MIDI IS EXCLUSIVE
 -------------------------------------
 Only ONE app can open the X-Touch MIDI In/Out ports.
 
-If Bitwig shows:
-  "MIDI Input/Output Error -- X-Touch: Could not open MIDI ...
-   There is not enough memory available for this task"
-that is almost NEVER RAM. It means REAPER (or another app) already holds
-the X-Touch ports. Same error works the other way if Bitwig grabbed first.
+Bitwig error "not enough memory" / "Could not open MIDI" for X-Touch =
+REAPER (or another app) already holds the ports. Not RAM.
 
-Horsemen CARE/start-all can launch Bitwig + REAPER together. If BOTH have
-Mackie/MCU enabled on the same X-Touch hardware, the second DAW fails.
-
-Fix (pick ONE owner for the desk):
-
-  A) X-Touch on BITWIG today
-     1. REAPER: Options -> Preferences -> Control/OSC/Web
-        -> select Mackie / MCU surface -> Remove (or close REAPER)
-     2. Unplug/replug X-Touch OR power-cycle it (clears stuck WinMIDI)
-     3. Bitwig: Controllers -> MCU / X-Touch -> toggle OFF then ON
-        MIDI In/Out = X-Touch ports
-
-  B) X-Touch on REAPER today
-     1. Bitwig: Controllers -> disable MCU / X-Touch (leave OSC on)
-     2. REAPER: Control/OSC/Web -> Mackie Control Universal -> X-Touch ports
-
-Agents keep working on ALL DAWs either way (MCP does not need the X-Touch).
+CARE/heal DISABLES REAPER's Mackie MCU surface so Bitwig can own the desk.
+Backup: %APPDATA%\REAPER\reaper.ini.bak_horsemen_xtouch
+Note:    %APPDATA%\REAPER\horsemen_xtouch_owner.txt
 
 
-BITWIG
-------
-1. Run INSTALL.bat or CARE.bat or Launchers menu F (heal).
+BITWIG SETUP (default)
+----------------------
+1. CARE.bat (or Launchers F) — heals extension + frees X-Touch from REAPER
 2. Settings -> Controllers -> Add Controller
-     Vendor: DrivenByMoss (or DawpocalypseMCP build)
-     Product: MCU - Control Universal   <-- full X-Touch desk
-     (or X-Touch One if that is your hardware)
-3. MIDI in/out = your X-Touch ports (not LoopBe unless bridging).
-4. Optional starter template (heal installs it):
-     Documents\Bitwig Studio\Library\Templates\
-       Mackie-XTouch-Behringer-Yggdrasil
-5. Agents still need DawpocalypseMCP OSC on 8005/9001 + shared SSE :8080.
-6. Keep DawpocalypseMCP OSC enabled even when MCU is off -- OSC != MIDI.
+     Vendor: DrivenByMoss / DawpocalypseMCP build
+     Product: MCU - Control Universal
+3. MIDI In/Out = X-Touch (hardware ports)
+4. Keep DawpocalypseMCP OSC on: Receive 8005 / Send 9001 / 127.0.0.1
+5. If MIDI error after heal: Controllers -> MCU OFF/ON, or unplug/replug X-Touch
+6. Template (heal installs):
+     Documents\Bitwig Studio\Library\Templates\Mackie-XTouch-Behringer-Yggdrasil
 
 
-REAPER
-------
-1. Options -> Preferences -> Control/OSC/Web -> Add
-2. Control surface mode: Mackie Control Universal (or HUI)
-3. MIDI input / output = X-Touch
-4. Run REAPER MCP bridge (Launchers menu 2) so agents can drive the same
-   session the X-Touch is mixing.
-5. If you switch the desk to Bitwig, REMOVE this surface first.
+REAPER (agents only by default — no X-Touch)
+--------------------------------------------
+REAPER MCP bridge still works (file mode). Mackie surface is OFF so it
+does not steal X-Touch from Bitwig.
 
-No CSI pack is shipped yet - native Mackie Control is enough for MCU.
+To put X-Touch on REAPER instead (optional):
+  1. Bitwig: disable MCU / X-Touch controller (leave OSC on)
+  2. Restore from reaper.ini.bak_horsemen_xtouch OR
+     Preferences -> Control/OSC/Web -> Add -> Mackie Control Universal
+  3. Know that Bitwig MCU will fail until REAPER surface is removed again
 
 
 RENOISE
 -------
-Renoise has no first-class Mackie MCU surface in this pack.
-Use Bitwig or REAPER for the X-Touch; drive Renoise via its MCP (ReMCP)
-for pattern/device work.
-
-
-MIDI PORT TIPS
---------------
-- Do not point X-Touch MCU and DawpocalypseMCP OSC at the same LoopBe
-  unless you know why (OSC is UDP 8005/9001; MCU is MIDI).
-- If faders fight the mouse, check takeover mode (Bitwig Controllers
-  takeover = Catch is fine).
-- loopMIDI / Bome multi-client can share one physical desk to two DAWs
-  if you deliberately split ports -- not required for Horsemen.
+No Mackie MCU in this pack. Drive Renoise via ReMCP; keep X-Touch on Bitwig.
 
 
 HEAL / CARE
 -----------
-  CARE.bat     = git update (if behind) + heal bridges/paths + Mackie
-                 template install + desktop shortcut + shared SSE + health
-  Launchers F  = heal only (no git pull)
-  Heal copies templates only -- it does NOT open MIDI ports by itself.
-  Launching Bitwig+REAPER both with MCU on the same X-Touch DOES conflict.
+  Always: Bitwig = X-Touch owner, REAPER Mackie cleared, templates installed.
