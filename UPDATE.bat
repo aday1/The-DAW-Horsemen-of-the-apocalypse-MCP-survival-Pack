@@ -17,11 +17,13 @@ echo  %BEHIND% new commit(s) on GitHub - updating...
 git pull --ff-only origin main || (echo  [!] pull failed - local edits? Commit or stash first. & pause & exit /b 1)
 set /p NEWVER=<VERSION
 echo  Now at version: %NEWVER%
-echo  Refreshing deps...
+echo  Refreshing deps + healing bridges/paths for THIS machine...
 where py >nul 2>nul && set "PY=py" || set "PY=python"
 %PY% -m pip install --user -q -r packages\reaper-mcp\requirements.txt
-%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette
+%PY% -m pip install --user -q "mcp[cli]>=1.4.1" python-osc pydantic pydantic-settings uvicorn starlette anyio
 pushd packages\renoise-mcp-bridge & call npm install --silent & popd
-copy /Y drivebymossvaday.bwextension "%USERPROFILE%\Documents\Bitwig Studio\Extensions\" >nul 2>nul
-echo  UPDATED %LOCALVER% -> %NEWVER%. Restart your MCP servers/clients.
+%PY% "%~dp0scripts\heal_daw_bridges.py"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\make_desktop_shortcut.ps1" -PackRoot "%~dp0"
+echo  UPDATED %LOCALVER% -> %NEWVER%. Restart Bitwig + MCP clients.
+echo  Bitwig controller name: DawpocalypseMCP  (recv 8005 / send 9001)
 pause

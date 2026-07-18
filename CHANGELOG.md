@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.0 — "DawpocalypseMCP" (2026-07-18)
+- Bitwig controller fork renamed **OSC-vaday → DawpocalypseMCP**; INSTALL/UPDATE
+  heal patches extension + prefs.
+- Auto-heal Bitwig OSC ports in prefs (receive **8005**, send **9001**) — fixes
+  "both are 8005" which prevented the OSC server from starting.
+- `scripts/heal_daw_bridges.py`: sync REAPER lua, Bitwig ext, rewrite
+  `mcp.generated.json` + Claude Desktop snippet with THIS machine's paths,
+  patch project `.mcp.json` / `.cursor/mcp.json`. Launchers menu **F**.
+
 ## 2.1.0 — "Generals Get a Shortcut" (2026-07-18)
 - `INSTALL.bat` creates Desktop shortcut **DAW MCP Launchers**, writes
   `mcp.generated.json` with absolute paths, opens Renoise ReMCP xrnx if missing.

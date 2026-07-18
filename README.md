@@ -21,10 +21,10 @@ cd DAW-Horsemen
 INSTALL.bat
 ```
 
-`INSTALL.bat` installs deps (pip + npm), drops the Bitwig extension and REAPER
-Lua bridge into place, installs/opens the Renoise ReMCP tool, **creates a
-Desktop shortcut "DAW MCP Launchers"**, and writes `mcp.generated.json` with
-absolute paths for this clone.
+`INSTALL.bat` installs deps (pip + npm), runs **`heal_daw_bridges.py`**
+(Bitwig **DawpocalypseMCP** extension + OSC ports 8005/9001, REAPER lua,
+machine-local MCP JSON), offers Renoise ReMCP, **creates Desktop shortcut
+"DAW MCP Launchers"**.
 
 **Wire your IDE next:** read **`IDE_SETUP.txt`** (Cursor, Claude Code, Claude
 CLI, VS Code, Claude Desktop/Cowork). Template: `mcp.json.example`.

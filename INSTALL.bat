@@ -28,18 +28,12 @@ pushd packages\renoise-mcp-bridge
 call npm install --silent
 popd
 
-echo  [3/7] Bitwig extension -^> Documents\Bitwig Studio\Extensions
-set "EXTDIR=%USERPROFILE%\Documents\Bitwig Studio\Extensions"
-if not exist "%EXTDIR%" mkdir "%EXTDIR%"
-copy /Y drivebymossvaday.bwextension "%EXTDIR%\" >nul && echo        ok
+echo  [3/7] Heal bridges + Bitwig OSC prefs ^(DawpocalypseMCP, ports 8005/9001^)
+echo        Close Bitwig first if it is open - prefs patch sticks better.
+%PY% "%PACK%\scripts\heal_daw_bridges.py"
+if errorlevel 1 echo        [!] heal failed - see messages above
 
-echo  [4/7] REAPER Lua bridge -^> %%APPDATA%%\REAPER\Scripts
-if exist "%APPDATA%\REAPER" (
-  if not exist "%APPDATA%\REAPER\Scripts" mkdir "%APPDATA%\REAPER\Scripts"
-  copy /Y packages\reaper-mcp\reaper_mcp_bridge.lua "%APPDATA%\REAPER\Scripts\" >nul && echo        ok
-) else (
-  echo        REAPER not found - skipped ^(install REAPER then re-run^)
-)
+echo  [4/7] ^(heal already synced REAPER lua^)
 
 echo  [5/7] Renoise ReMCP tool ^(open xrnx if not already installed^)
 set "REMCP=%APPDATA%\Renoise\V3.5.4\Scripts\Tools\com.renoise.ReMCP.xrnx"
@@ -54,8 +48,7 @@ echo  [6/7] Desktop shortcut "DAW MCP Launchers"
 %PS% -File "%PACK%\scripts\make_desktop_shortcut.ps1" -PackRoot "%PACK%"
 if errorlevel 1 echo        [!] shortcut failed - run scripts\make_desktop_shortcut.ps1 manually
 
-echo  [7/7] Write mcp.generated.json ^(absolute paths for THIS machine^)
-%PS% -File "%PACK%\scripts\write_mcp_generated.ps1" -PackRoot "%PACK%"
+echo  [7/7] mcp.generated.json already written by heal
 
 echo.
 echo  ============================================================

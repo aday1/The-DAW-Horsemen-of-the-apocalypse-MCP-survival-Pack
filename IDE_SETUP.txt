@@ -54,16 +54,30 @@ Then: /mcp  (or your CLI's MCP status) to confirm bitwig/reaper/renoise listed.
 
 4) CLAUDE DESKTOP / COWORK
 --------------------------
-A) Open Claude Desktop -> Settings -> Developer -> Edit Config
-   (claude_desktop_config.json), OR add a custom connector.
-B) Prefer URL for Bitwig:
-     "bitwig": { "url": "http://127.0.0.1:8080/sse" }
-   If the UI only accepts a command, use the stdio shim:
-     npx -y mcp-remote http://127.0.0.1:8080/sse
-C) For reaper/renoise paste the command blocks from mcp.generated.json
-   (absolute paths to THIS clone).
-D) Fully quit + reopen Claude Desktop after edits.
-E) Start shared Bitwig SSE before chatting.
+IMPORTANT: Claude Desktop's Developer UI is stdio-only (Command + Arguments).
+A bare "url" field is often IGNORED — you will still see python -m bitwig_mcp_server
+in the logs and get "No module named bitwig_mcp_server".
+
+Use the mcp-remote shim so Desktop talks to the SHARED SSE server:
+
+  Command:  C:\Program Files\nodejs\npx.cmd
+  Args:     -y
+            mcp-remote
+            http://127.0.0.1:8080/sse
+
+Or in claude_desktop_config.json:
+
+  "bitwig": {
+    "command": "C:\\Program Files\\nodejs\\npx.cmd",
+    "args": ["-y", "mcp-remote", "http://127.0.0.1:8080/sse"]
+  }
+
+For reaper/renoise paste the command blocks from mcp.generated.json
+(absolute paths to THIS clone).
+
+Fully quit Claude Desktop (tray too) + reopen after edits.
+Start shared Bitwig SSE BEFORE opening Claude (Launchers menu 1 or 5).
+Confirm: http://127.0.0.1:8080/healthz  -> {"ok":true,...}
 
 
 5) VS CODE
@@ -83,8 +97,9 @@ settings "mcp.servers"). Start shared Bitwig SSE first.
 DAW SIDE (once per session)
 ---------------------------
 BITWIG
-  - Controllers: DrivenByMoss "Open Sound Control"
+  - Controllers: add/enable **DawpocalypseMCP** (DrivenByMoss Open Sound Control fork)
   - Receive 8005 / Send 9001 / host 127.0.0.1
+  - If both ports say 8005, run Launchers menu F (HEAL) with Bitwig closed
   - Toggle controller OFF/ON after starting shared SSE if tools time out
 
 REAPER

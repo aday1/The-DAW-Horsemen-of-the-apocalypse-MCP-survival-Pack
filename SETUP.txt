@@ -35,7 +35,8 @@ What rides what
 ---------------
   REAPER   packages/reaper-mcp/            Python MCP + Lua bridge
   RENOISE  packages/renoise-mcp-bridge/    Node bridge -> ReMCP in Renoise
-  BITWIG   packages/bitwig-mcp-server/     Shared SSE MCP + DrivenByMoss OSC
+  BITWIG   packages/bitwig-mcp-server/     Shared SSE MCP + DawpocalypseMCP OSC
+                                           (DrivenByMoss fork; recv 8005 / send 9001)
   REASON   packages/reason/                No own MCP - use REAPER + Rack Plugin
 
 

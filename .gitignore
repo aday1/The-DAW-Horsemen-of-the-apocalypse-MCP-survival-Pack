@@ -34,4 +34,6 @@ dependency-reduced-pom.xml
 # Pack runtime junk
 publish_log.txt
 mcp.generated.json
+mcp.claude_desktop.snippet.json
+DawpocalypseMCP.bwextension
 packages/renoise-mcp-bridge/package-lock.json
