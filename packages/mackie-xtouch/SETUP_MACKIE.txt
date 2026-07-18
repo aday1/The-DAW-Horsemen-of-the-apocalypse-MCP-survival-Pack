@@ -1,0 +1,55 @@
+MACKIE / BEHRINGER X-TOUCH (with DAW Horsemen MCP)
+==================================================
+The X-Touch is NOT a separate MCP server. It talks MCU/MIDI to the DAW.
+MCP (Cursor/Claude) talks OSC/HTTP to the same DAW. They share the desk.
+
+  X-Touch  --MCU MIDI-->  Bitwig / REAPER
+  Agents   --MCP------->  same DAW
+
+DawpocalypseMCP.bwextension (DrivenByMoss fork) already includes:
+  - MCU - Control Universal  (+ extenders)
+  - X-Touch One
+  - HUI variants
+  - DawpocalypseMCP OSC (for agents)
+
+BITWIG
+------
+1. Run INSTALL.bat or CARE.bat or Launchers menu F (heal).
+2. Settings -> Controllers -> Add Controller
+     Vendor: DrivenByMoss (or DawpocalypseMCP build)
+     Product: MCU - Control Universal   <-- full X-Touch desk
+     (or X-Touch One if that is your hardware)
+3. MIDI in/out = your X-Touch ports (not LoopBe unless bridging).
+4. Optional starter template (heal installs it):
+     Documents\Bitwig Studio\Library\Templates\
+       Mackie-XTouch-Behringer-Yggdrasil
+5. Agents still need DawpocalypseMCP OSC on 8005/9001 + shared SSE :8080.
+
+REAPER
+------
+1. Options -> Preferences -> Control/OSC/Web -> Add
+2. Control surface mode: Mackie Control Universal (or HUI)
+3. MIDI input / output = X-Touch
+4. Run REAPER MCP bridge (Launchers menu 2) so agents can drive the same
+   session the X-Touch is mixing.
+
+No CSI pack is shipped yet - native Mackie Control is enough for MCU.
+
+RENOISE
+-------
+Renoise has no first-class Mackie MCU surface in this pack.
+Use Bitwig or REAPER for the X-Touch; drive Renoise via its MCP (ReMCP)
+for pattern/device work. Dual-DAW: X-Touch on Bitwig/REAPER, agents on all.
+
+MIDI PORT TIPS
+--------------
+- Do not point X-Touch MCU and DawpocalypseMCP OSC at the same LoopBe
+  unless you know why (OSC is UDP 8005/9001; MCU is MIDI).
+- If faders fight the mouse, check takeover mode (Bitwig Controllers
+  takeover = Catch is fine).
+
+HEAL / CARE
+-----------
+  CARE.bat     = git update (if behind) + heal bridges/paths + Mackie
+                 template install + desktop shortcut + health check
+  Launchers F  = heal only (no git pull)

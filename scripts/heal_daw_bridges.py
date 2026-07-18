@@ -186,6 +186,52 @@ def sync_reaper(pack: Path) -> None:
     print(f"  REAPER lua -> {dest}")
 
 
+def install_mackie_xtouch(pack: Path) -> None:
+    """Install Behringer X-Touch Bitwig template from pack (MCU is in DawpocalypseMCP)."""
+    src = pack / "packages" / "mackie-xtouch" / "bitwig-template"
+    if not src.is_dir():
+        print("  WARN: packages/mackie-xtouch/bitwig-template missing")
+        return
+    dest = (
+        Path.home()
+        / "Documents"
+        / "Bitwig Studio"
+        / "Library"
+        / "Templates"
+        / "Mackie-XTouch-Behringer-Yggdrasil.bwtemplate"
+    )
+    dest.mkdir(parents=True, exist_ok=True)
+    for item in src.iterdir():
+        target = dest / item.name
+        if item.is_dir():
+            if target.exists():
+                shutil.rmtree(target)
+            shutil.copytree(item, target)
+        else:
+            shutil.copy2(item, target)
+    proj_src = (
+        pack
+        / "packages"
+        / "mackie-xtouch"
+        / "bitwig-project"
+        / "MackieXtouch-Tracking-Start.bwproject"
+    )
+    if proj_src.is_file():
+        proj_dest_dir = (
+            Path.home()
+            / "Documents"
+            / "Bitwig Studio"
+            / "Projects"
+            / "Templates-Horsemen"
+        )
+        proj_dest_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(proj_src, proj_dest_dir / proj_src.name)
+        print(f"  Bitwig starter project -> {proj_dest_dir / proj_src.name}")
+    print(f"  Bitwig X-Touch template -> {dest}")
+    print("  MCU surface: Controllers -> DrivenByMoss -> MCU - Control Universal")
+    print("  (same DawpocalypseMCP.bwextension; X-Touch is MIDI MCU, not MCP)")
+
+
 def tip_renoise(pack: Path) -> None:
     remcp = (
         Path(os.environ.get("APPDATA", ""))
@@ -321,6 +367,9 @@ def main() -> int:
 
     print("[4] Renoise ReMCP")
     tip_renoise(pack)
+
+    print("[4b] Mackie / Behringer X-Touch (Bitwig template + MCU note)")
+    install_mackie_xtouch(pack)
 
     print("[5] mcp.generated.json")
     write_mcp_generated(pack)

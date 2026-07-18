@@ -6,10 +6,11 @@ MCP servers + bridges so Claude / Cursor / any MCP client can drive your studio:
 
 | Horseman | DAW | Path | Rides on |
 |---|---|---|---|
-| ☠️ **Death** | REAPER | `packages/reaper-mcp/` | Python + Lua bridge |
-| ⚔️ **War** | Bitwig | `packages/bitwig-mcp-server/` | Python + OSC (DrivenByMoss) |
-| 🦠 **Pestilence** | Renoise | `packages/renoise-mcp-bridge/` | Node → ReMCP (HTTP) |
-| 🌾 **Famine** | Reason | `packages/reason/` | No MCP of its own — rides inside REAPER (Rack Plugin) |
+| Death | REAPER | `packages/reaper-mcp/` | Python + Lua bridge |
+| War | Bitwig | `packages/bitwig-mcp-server/` | Python + OSC (DawpocalypseMCP) |
+| Pestilence | Renoise | `packages/renoise-mcp-bridge/` | Node → ReMCP (HTTP) |
+| Famine | Reason | `packages/reason/` | No MCP of its own — rides inside REAPER (Rack Plugin) |
+| (desk) | Behringer X-Touch | `packages/mackie-xtouch/` | MCU MIDI via DawpocalypseMCP / REAPER Mackie — not a separate MCP |
 
 **This repo is the source of truth.** Machines install from it and update from it.
 
@@ -18,13 +19,14 @@ MCP servers + bridges so Claude / Cursor / any MCP client can drive your studio:
 ```bat
 git clone https://github.com/aday1/The-DAW-Horsemen-of-the-apocalypse-MCP-survival-Pack.git DAW-Horsemen
 cd DAW-Horsemen
-INSTALL.bat
+CARE.bat
 ```
 
-`INSTALL.bat` installs deps (pip + npm), runs **`heal_daw_bridges.py`**
-(Bitwig **DawpocalypseMCP** extension + OSC ports 8005/9001, REAPER lua,
-machine-local MCP JSON), offers Renoise ReMCP, **creates Desktop shortcut
-"DAW MCP Launchers"**.
+`CARE.bat` is the GitHub care package: pulls if behind, **heals** Bitwig
+OSC ports + **DawpocalypseMCP** extension, REAPER lua, Mackie/X-Touch
+template, rewrites per-machine MCP JSON, Desktop shortcut, health check.
+
+`INSTALL.bat` still works for a first-time deps-only path; CARE is preferred.
 
 **Wire your IDE next:** read **`IDE_SETUP.txt`** (Cursor, Claude Code, Claude
 CLI, VS Code, Claude Desktop/Cowork). Template: `mcp.json.example`.

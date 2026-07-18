@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3.0 — "CARE + X-Touch" (2026-07-18)
+- **`CARE.bat`**: GitHub care package — pull if behind, always heal
+  (OSC ports, DawpocalypseMCP, REAPER lua, MCP paths), Mackie template,
+  desktop shortcut, health check.
+- **`packages/mackie-xtouch/`**: Behringer X-Touch Bitwig template + starter
+  project + SETUP. MCU lives in DawpocalypseMCP (DrivenByMoss); X-Touch is
+  MIDI MCU beside MCP, not a second MCP server. REAPER uses native Mackie
+  Control; Renoise has no MCU in this pack (honest).
+- Launchers menu **C** = CARE; heal installs Mackie template automatically.
+
 ## 2.2.0 — "DawpocalypseMCP" (2026-07-18)
 - Bitwig controller fork renamed **OSC-vaday → DawpocalypseMCP**; INSTALL/UPDATE
   heal patches extension + prefs.
