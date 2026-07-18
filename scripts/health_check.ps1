@@ -79,21 +79,35 @@ if (Test-Path -LiteralPath $remcp) { Ok "Renoise ReMCP present ($remcp)" } else 
 # --- agent configs ---
 Write-Host ''
 Write-Host '[agent MCP configs]'
-$jamRoot = Split-Path $Pack -Parent
-$mcpJson = Join-Path $jamRoot '.mcp.json'
-$cursorMcp = Join-Path $jamRoot '.cursor\mcp.json'
-foreach ($cfg in @($mcpJson, $cursorMcp)) {
-  if (-not (Test-Path -LiteralPath $cfg)) { Bad "missing $cfg"; continue }
-  $raw = Get-Content -LiteralPath $cfg -Raw
-  $name = Split-Path $cfg -Leaf
-  if ($raw -match '127\.0\.0\.1:8080/sse') { Ok "$name bitwig -> shared SSE :8080" }
-  else { Bad "$name bitwig NOT pointing at http://127.0.0.1:8080/sse" }
-  if ($raw -match 'DAW-Horsemen.+reaper-mcp') { Ok "$name reaper -> Horsemen pack" }
-  elseif ($raw -match 'reaper.mcp|reaper_mcp') { Bad "$name reaper path not under DAW-Horsemen" }
-  if ($raw -match 'DAW-Horsemen.+renoise-mcp-bridge') { Ok "$name renoise -> Horsemen pack" }
-  elseif ($raw -match 'renoise.mcp|renoise-mcp') { Bad "$name renoise path not under DAW-Horsemen" }
-  if ($raw -match 'bitwig_mcp_server' -and $raw -notmatch '8080/sse') {
-    Bad "$name still has stdio bitwig_mcp_server without SSE (will fight UDP 9001)"
+$cfgRoots = @()
+$parent = Split-Path $Pack -Parent
+if ((Split-Path $parent -Leaf) -ne 'Programs') { $cfgRoots += $parent }
+foreach ($cand in @('E:\ChiptuneClaude', (Join-Path $env:USERPROFILE 'ChiptuneClaude'))) {
+  if ((Test-Path -LiteralPath $cand) -and ($cfgRoots -notcontains $cand)) { $cfgRoots += $cand }
+}
+$cfgRoots += $Pack
+$seen = @{}
+foreach ($root in $cfgRoots) {
+  foreach ($rel in @('.mcp.json', '.cursor\mcp.json')) {
+    $cfg = Join-Path $root $rel
+    if ($seen.ContainsKey($cfg)) { continue }
+    $seen[$cfg] = $true
+    if (-not (Test-Path -LiteralPath $cfg)) {
+      if ($root -eq $Pack) { Bad "missing $cfg (run CARE.bat)" }
+      else { Info "skip missing $cfg" }
+      continue
+    }
+    $raw = Get-Content -LiteralPath $cfg -Raw
+    $name = "$($root | Split-Path -Leaf)/$(Split-Path $cfg -Leaf)"
+    if ($raw -match '127\.0\.0\.1:8080/sse') { Ok "$name bitwig -> shared SSE :8080" }
+    else { Bad "$name bitwig NOT pointing at http://127.0.0.1:8080/sse" }
+    if ($raw -match 'DAW-Horsemen.+reaper-mcp') { Ok "$name reaper -> Horsemen pack" }
+    elseif ($raw -match 'reaper.mcp|reaper_mcp') { Bad "$name reaper path not under DAW-Horsemen" }
+    if ($raw -match 'DAW-Horsemen.+renoise-mcp-bridge') { Ok "$name renoise -> Horsemen pack" }
+    elseif ($raw -match 'renoise.mcp|renoise-mcp') { Bad "$name renoise path not under DAW-Horsemen" }
+    if ($raw -match 'bitwig_mcp_server' -and $raw -notmatch '8080/sse') {
+      Bad "$name still has stdio bitwig_mcp_server without SSE (will fight UDP 9001)"
+    }
   }
 }
 

@@ -3,6 +3,7 @@
 ## 2.5.2 — "MSI CARE polish" (2026-07-18)
 - Heal no longer writes `.mcp.json` into `%LOCALAPPDATA%\Programs\` when installed via MSI.
 - Health check treats missing `.git` as Info (MSI/ZIP), not BAD.
+- Health check agent roots: pack + jam machine, never `Programs\` parent.
 
 ## 2.5.1 — "MSI Ship" (2026-07-18)
 - **Release artifact is MSI** (`DAW-Horsemen-<ver>.msi`), not ZIP.
@@ -73,4 +74,5 @@
 
 ## 1.x
 - Initial pack: REAPER, Renoise, Bitwig MCP + Reason notes, extract scripts.
+
 
