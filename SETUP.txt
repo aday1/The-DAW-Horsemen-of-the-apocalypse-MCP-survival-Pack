@@ -53,3 +53,18 @@ Files to know
   launch_daw_mcp.bat      menu
   scripts\health_check.ps1
   docs\index.html         showcase page
+  README.md               install + full upstream CREDITS
+
+
+Credits (upstream authors)
+--------------------------
+  REAPER MCP     TwelveTake Studios LLC   https://github.com/TwelveTake/reaper-mcp
+  Bitwig MCP     John Stanford (jxstanford) https://github.com/jxstanford/bitwig-mcp-server
+  DrivenByMoss   Jürgen Moßgraber         https://www.mossgrabers.de/
+                 (OSC/MCU; DawpocalypseMCP is a renamed fork of that surface)
+  ReMCP Renoise  kraken (kraken@renoise.com)
+                 https://www.renoise.com/tools/renoise-mcp
+                 also renoise/tools (PR by kunitoki)
+  Pack tooling   aday (+ Claude) — shared SSE, CARE/INSTALL/heal, launchers
+
+  Each package keeps its own LICENSE. See README.md Credits section.

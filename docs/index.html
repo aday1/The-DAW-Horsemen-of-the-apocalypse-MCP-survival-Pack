@@ -71,24 +71,30 @@
       <span class="icon">☠️</span>
       <h3>DEATH</h3><div class="daw">REAPER</div>
       <p>The pale rider. Tracks, items, MIDI, FX, envelopes, renders — the full harvest. Python server + Lua bridge.</p>
+      <p class="credits">Upstream: <a href="https://github.com/TwelveTake/reaper-mcp">TwelveTake Studios LLC</a></p>
       <code>packages/reaper-mcp/</code>
     </div>
     <div class="card war">
       <span class="icon">⚔️</span>
       <h3>WAR</h3><div class="daw">BITWIG</div>
       <p>Takes peace from the earth — but shares one OSC link. Shared SSE server lets EVERY client ride at once.</p>
+      <p class="credits">Upstream: <a href="https://github.com/jxstanford/bitwig-mcp-server">John Stanford (jxstanford)</a>
+        · OSC/MCU: <a href="https://www.mossgrabers.de/Software/Bitwig/Bitwig.html">Jürgen Moßgraber / DrivenByMoss</a></p>
       <code>packages/bitwig-mcp-server/</code>
     </div>
     <div class="card pest">
       <span class="icon">🦠</span>
       <h3>PESTILENCE</h3><div class="daw">RENOISE</div>
       <p>Spreads through the tracker grid, pattern by pattern. Node bridge into ReMCP running inside Renoise.</p>
+      <p class="credits">Upstream: <a href="https://www.renoise.com/tools/renoise-mcp">ReMCP by kraken</a>
+        (<a href="https://github.com/renoise/tools">renoise/tools</a>)</p>
       <code>packages/renoise-mcp-bridge/</code>
     </div>
     <div class="card famine">
       <span class="icon">🌾</span>
       <h3>FAMINE</h3><div class="daw">REASON</div>
       <p>Has no MCP of its own — it starves. So it rides inside REAPER as a Rack Plugin, and Death carries two.</p>
+      <p class="credits">Control rides TwelveTake REAPER MCP (no separate Reason MCP)</p>
       <code>packages/reason/</code>
     </div>
   </div>
@@ -114,14 +120,26 @@
   <b>http://127.0.0.1:8080/sse</b> instead of fighting over UDP 9001. Full IDE wiring:
   <b>IDE_SETUP.txt</b>.</p>
 
-  <h2>CREDITS</h2>
-  <p class="credits">Built on the shoulders of upstream riders:
-  REAPER MCP — <a href="https://github.com/TwelveTake">TwelveTake</a> lineage ·
-  Bitwig MCP — <a href="https://github.com/jxstanford/bitwig-mcp-server">jxstanford/bitwig-mcp-server</a> ·
-  OSC — <a href="http://www.mossgrabers.de/">DrivenByMoss, Jürgen Moßgraber</a> ·
-  Renoise-side — ReMCP. Pack tooling, shared server &amp; assembly — aday + Claude.
-  Respect each package's LICENSE.</p>
+  <h2>CREDITS (UPSTREAM RIDERS)</h2>
+  <p class="credits">This pack wires other people's work. Full names belong here:</p>
+  <ul class="credits" style="margin:12px 0 0 1.2em;line-height:1.85">
+    <li><b>REAPER MCP</b> — <a href="https://github.com/TwelveTake/reaper-mcp">TwelveTake Studios LLC</a>
+      (<a href="https://twelvetake.com">twelvetake.com</a>) · MIT</li>
+    <li><b>Bitwig MCP</b> — <a href="https://github.com/jxstanford/bitwig-mcp-server">John Stanford (jxstanford)</a>
+      · MIT</li>
+    <li><b>DrivenByMoss</b> (OSC + MCU for Bitwig; DawpocalypseMCP fork) —
+      <a href="https://www.mossgrabers.de/Software/Bitwig/Bitwig.html">Jürgen Moßgraber</a>
+      · <a href="https://www.mossgrabers.de/">mossgrabers.de</a></li>
+    <li><b>ReMCP / Renoise MCP</b> — <b>kraken</b> (<a href="mailto:kraken@renoise.com">kraken@renoise.com</a>);
+      tool page <a href="https://www.renoise.com/tools/renoise-mcp">renoise.com/tools/renoise-mcp</a>;
+      also in <a href="https://github.com/renoise/tools">renoise/tools</a> (PR by kunitoki)</li>
+    <li><b>This pack</b> (shared SSE, CARE/INSTALL/heal, launchers, IDE wiring) — aday (+ Claude tooling).
+      Does not replace or relicense the upstreams.</li>
+  </ul>
+  <p class="credits" style="margin-top:14px">Respect each package's LICENSE. Support upstreams where you can
+  (TwelveTake tip jars, DrivenByMoss site, Renoise tools).</p>
 </main>
-<footer>🐎 And I looked, and behold, four DAWs — and their MIDI followed with them. · aday1 · Beerware-adjacent, see per-package licenses</footer>
+<footer>And I looked, and behold, four DAWs — and their MIDI followed with them.
+  · Pack: aday1 · Upstream: TwelveTake · jxstanford · Jürgen Moßgraber · kraken · see per-package licenses</footer>
 </body>
 </html>
